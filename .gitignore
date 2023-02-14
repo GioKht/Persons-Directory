@@ -3,3 +3,8 @@
 ################################################################################
 
 /Persons.Directory.API/Persons.Directory.API/bin/Debug/net6.0
+/Persons.Directory.API/Persons.Directory.API/obj
+/.vs
+/Persons.Directory.API/Persons.Directory.DI/obj
+/Persons.Directory.API/Persons.Directory.Persistence/obj
+/Persons.Directory.API/.vs/Persons.Directory.API
