@@ -1,5 +1,10 @@
+using Persons.Directory.DI;
+using Persons.Directory.DI.StartupExtensions;
+using Persons.Directory.Persistence.Db;
+
 var builder = WebApplication.CreateBuilder(args);
 
+DependencyResolver.Resolve(builder);
 // Add services to the container.
 
 builder.Services.AddControllers();
