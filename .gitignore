@@ -10,3 +10,6 @@
 /Persons.Directory.API/.vs/Persons.Directory.API
 /Persons.Directory.API/.vs/ProjectEvaluation
 /Persons.Directory.API/Persons.Directory.Application/obj
+/Persons.Directory.API/Persons.Directory.Application/bin/Debug/net6.0
+/Persons.Directory.API/Persons.Directory.DI/bin/Debug/net6.0
+/Persons.Directory.API/Persons.Directory.Persistence/bin/Debug/net6.0

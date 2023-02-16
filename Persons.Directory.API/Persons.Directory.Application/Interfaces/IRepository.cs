@@ -1,7 +1,7 @@
 ﻿using Persons.Directory.Application.Domain;
 using System.Linq.Expressions;
 
-namespace Persons.Directory.Persistence.Repository;
+namespace Persons.Directory.Application.Interfaces;
 
 public interface IRepository<TEntity> where TEntity : Entity
 {

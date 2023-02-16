@@ -2,9 +2,9 @@
 {
     public enum RelatedType
     {
-        Colleague,
-        Familiar,
-        Relative,
-        Other
+        Colleague = 1,
+        Familiar = 2,
+        Relative = 3,
+        Other = 4
     }
 }

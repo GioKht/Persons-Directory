@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Persons.Directory.Application.Domain;
+using Persons.Directory.Application.Interfaces;
 using Persons.Directory.Persistence.Db;
-using Persons.Directory.Persistence.Repository;
 
 namespace Persons.Directory.Persistence.Uow
 {

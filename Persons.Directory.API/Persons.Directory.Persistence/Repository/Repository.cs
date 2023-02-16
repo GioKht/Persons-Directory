@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Persons.Directory.Application.Domain;
+using Persons.Directory.Application.Interfaces;
 using Persons.Directory.Persistence.Db;
 using System.Linq.Expressions;
 

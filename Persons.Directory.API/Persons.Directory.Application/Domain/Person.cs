@@ -13,14 +13,14 @@ public class Person : Entity
         string firstName,
         string lastName,
         string personalId,
-        DateOnly birthDate,
+        DateTime birthDate,
         string city,
         string phoneNumber,
         string image,
         Gender gender,
         PhoneNumberType phoneNumberType,
-        RelatedType relatedType,
-        int? relatedPersonId)
+        RelatedType? relatedType = null,
+        int? relatedPersonId = null)
     {
         FirstName = firstName;
         LastName = lastName;
@@ -41,7 +41,7 @@ public class Person : Entity
 
     public string PersonalId { get; private set; }
 
-    public DateOnly BirthDate { get; private set; }
+    public DateTime BirthDate { get; private set; }
 
     public string City { get; private set; }
 
@@ -55,5 +55,5 @@ public class Person : Entity
 
     public PhoneNumberType PhoneNumberType { get; private set; }
 
-    public RelatedType RelatedType { get; private set; }
+    public RelatedType? RelatedType { get; private set; }
 }

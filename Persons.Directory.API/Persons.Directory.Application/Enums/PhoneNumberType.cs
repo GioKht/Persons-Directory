@@ -2,7 +2,7 @@
 
 public enum PhoneNumberType
 {
-    Mobile,
-    Office,
-    Home
+    Mobile = 1,
+    Office = 2,
+    Home = 3
 }

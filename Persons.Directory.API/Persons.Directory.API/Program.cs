@@ -1,18 +1,18 @@
 using Persons.Directory.DI;
-using Persons.Directory.DI.StartupExtensions;
-using Persons.Directory.Persistence.Db;
+using Persons.Directory.Persistence.Initializer;
 
 var builder = WebApplication.CreateBuilder(args);
 
 DependencyResolver.Resolve(builder);
-// Add services to the container.
 
-builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+var dbInitializer = new DbInitializer();
+await dbInitializer.Seed(app.Services);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

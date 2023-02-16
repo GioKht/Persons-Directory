@@ -1,7 +1,6 @@
 ﻿using Persons.Directory.Application.Domain;
-using Persons.Directory.Persistence.Repository;
 
-namespace Persons.Directory.Persistence.Uow;
+namespace Persons.Directory.Application.Interfaces;
 
 public interface IUnitOfWork
 {

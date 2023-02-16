@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using MediatR;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Persons.Directory.Application;
 using Persons.Directory.DI.StartupExtensions;
 using Persons.Directory.Persistence.Db;
 
@@ -13,7 +16,10 @@ public class DependencyResolver
         var connectionString = builder.Configuration.GetConnectionString(nameof(ApplicationDbContext));
 
         builder.Services
+            .AddMediatR(typeof(ApplicationProgram))
+            .AddFluentValidation()
             .AddApplicationServices()
-            .AddApplicationDbContext(connectionString);
+            .AddApplicationDbContext(connectionString)
+            .AddControllers();
     }
 }

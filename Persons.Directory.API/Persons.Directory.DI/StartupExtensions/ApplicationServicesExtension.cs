@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Persons.Directory.Application.Interfaces;
 using Persons.Directory.Persistence.Repository;
 using Persons.Directory.Persistence.Uow;
 
