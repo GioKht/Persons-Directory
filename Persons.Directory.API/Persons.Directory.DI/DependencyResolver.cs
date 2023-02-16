@@ -8,7 +8,6 @@ using Persons.Directory.Persistence.Db;
 
 namespace Persons.Directory.DI;
 
-
 public class DependencyResolver
 {
     public static void Resolve(WebApplicationBuilder builder)
@@ -19,7 +18,6 @@ public class DependencyResolver
             .AddMediatR(typeof(ApplicationProgram))
             .AddFluentValidation()
             .AddApplicationServices()
-            .AddApplicationDbContext(connectionString)
-            .AddControllers();
+            .AddApplicationDbContext(connectionString);
     }
 }

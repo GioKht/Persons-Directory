@@ -1,4 +1,6 @@
-﻿namespace Persons.Directory.Application.PersonManagement.Records;
+﻿using Persons.Directory.Application.Enums;
+
+namespace Persons.Directory.Application.PersonManagement.Records;
 
 public record PersonRecord(
     int Id,

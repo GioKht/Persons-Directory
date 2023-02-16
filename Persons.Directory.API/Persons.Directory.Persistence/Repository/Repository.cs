@@ -42,6 +42,16 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : Entity
         _db.Set<TEntity>().Remove(entity);
     }
 
+    public IQueryable<TEntity> Query(Expression<Func<TEntity, bool>>? expression = null)
+    {
+        if (expression == null)
+        {
+            return _db.Set<TEntity>();
+        }
+
+        return _db.Set<TEntity>().Where(expression);
+    }
+
     public async Task<IQueryable<TEntity>> QueryAsync(Expression<Func<TEntity, bool>>? expression = null)
     {
         if (expression == null)
