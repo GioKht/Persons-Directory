@@ -51,7 +51,7 @@ public class GetPersonDetailsQueryHandler : IRequestHandler<GetPersonDetailsRequ
             FirstName = person.FirstName,
             LastName = person.LastName,
             PersonalId = person.PersonalId,
-            BirthDate = person.BirthDate,
+            BirthDate = $"{person.BirthDate:dd-MM-yyyy}",
             PhoneNumber = person.PhoneNumber,
             RelatedPersonId = person.RelatedPersonId,
             Image = person.Image,
@@ -77,7 +77,7 @@ public class GetPersonDetailsResponse
 
     public string PersonalId { get; set; }
 
-    public DateTime BirthDate { get; set; }
+    public string BirthDate { get; set; }
 
     public string PhoneNumber { get; set; }
 
