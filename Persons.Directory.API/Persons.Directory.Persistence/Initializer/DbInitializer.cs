@@ -2,9 +2,11 @@
 using Microsoft.Extensions.DependencyInjection;
 using Persons.Directory.Application.Domain;
 using Persons.Directory.Application.Enums;
+using Persons.Directory.Application.Models;
 using Persons.Directory.Application.PersonManagement.Commands;
 using Persons.Directory.Application.PersonManagement.Models;
 using Persons.Directory.Persistence.Db;
+using System.Text.Json;
 
 namespace Persons.Directory.Persistence.Initializer;
 
@@ -28,6 +30,21 @@ public class DbInitializer
             await context.Set<Person>().AddRangeAsync(newPersons);
             await context.SaveChangesAsync();
         }
+
+        var citiesList = await context.Set<City>().ToListAsync();
+
+        if (!citiesList.Any())
+        {
+            using var jsonStream = File.OpenRead("CitiesData.json");
+
+            var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+            var result = await JsonSerializer.DeserializeAsync<CityResultModel>(jsonStream, options);
+
+            result.Cities.ForEach(x=> x.SetCreateDate());
+
+            await context.Set<City>().AddRangeAsync(result.Cities);
+            await context.SaveChangesAsync();
+        }
     }
 
     private IEnumerable<Person> GetPersons()
@@ -40,7 +57,7 @@ public class DbInitializer
                 LastName = "Khutsishvili",
                 PersonalId = "01010101123",
                 BirthDate = new DateTime(1980, 01, 01),
-                City = "Tbilisi",
+                CityId = 1,
                 Gender = Gender.Male,
                 PhoneNumbers = new List<PhoneNumberModel>()
                 {
@@ -63,7 +80,7 @@ public class DbInitializer
                 LastName = "Goderdzishvili",
                 PersonalId = "01010101123",
                 BirthDate = new DateTime(1980, 01, 01),
-                City = "Tbilisi",
+                CityId = 2,
                 Gender = Gender.Female,
                 PhoneNumbers = new List<PhoneNumberModel>()
                 {
@@ -86,7 +103,7 @@ public class DbInitializer
                 LastName = "Doe",
                 PersonalId = "01010101123",
                 BirthDate = new DateTime(1988, 05, 09),
-                City = "Tbilisi",
+                CityId = 3,
                 Gender = Gender.Male,
                 PhoneNumbers = new List<PhoneNumberModel>()
                 {

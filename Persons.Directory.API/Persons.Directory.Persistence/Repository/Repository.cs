@@ -42,6 +42,11 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : Entity
         _db.Set<TEntity>().Remove(entity);
     }
 
+    public async Task<IDictionary<int, TEntity>> ToDictionaryAsync()
+    {
+        return await _db.Set<TEntity>().ToDictionaryAsync(x => x.Id);
+    }
+
     public IQueryable<TEntity> Query(Expression<Func<TEntity, bool>>? expression = null)
     {
         if (expression == null)

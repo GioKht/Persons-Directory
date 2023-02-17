@@ -13,6 +13,8 @@ public interface IRepository<TEntity> where TEntity : Entity
 
     Task UpdateAsync(TEntity entity);
 
+    Task<IDictionary<int, TEntity>> ToDictionaryAsync();
+
     IQueryable<TEntity> Query(Expression<Func<TEntity, bool>>? expression = null);
 
     Task<IQueryable<TEntity>> QueryAsync(Expression<Func<TEntity, bool>>? expression = null);

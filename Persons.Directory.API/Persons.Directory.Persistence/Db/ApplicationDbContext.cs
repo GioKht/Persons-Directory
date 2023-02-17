@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Persons.Directory.Application.Domain;
 using Persons.Directory.Application.TypeConfiguration;
+using System.Reflection;
 
 namespace Persons.Directory.Persistence.Db
 {
@@ -11,7 +13,9 @@ namespace Persons.Directory.Persistence.Db
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfiguration(new PersonTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new PersonTypeConfiguration())
+                        .ApplyConfiguration(new PhoneNumberTypeConfiguration())
+                        .ApplyConfiguration(new CityTypeConfiguration());
         }
     }
 }

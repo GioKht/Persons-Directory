@@ -1,7 +1,9 @@
 ﻿using MediatR;
 using Persons.Directory.Application.Domain;
+using Persons.Directory.Application.Enums;
 using Persons.Directory.Application.Exceptions;
 using Persons.Directory.Application.Interfaces;
+using Persons.Directory.Application.PersonManagement.Models;
 using System.Net;
 using System.Text.Json.Serialization;
 
@@ -42,5 +44,7 @@ public class UpdatePersonRequest : IRequest<Unit>
 
     public string LastName { get; set; }
 
-    public string City { get; set; }
+    public int CityId { get; set; }
+
+    public IEnumerable<UpdatePhoneNumberModel> PhoneNumbers { get; set; }
 }

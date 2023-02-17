@@ -22,6 +22,39 @@ namespace Persons.Directory.Persistence.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Persons.Directory.Application.Domain.City", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NameEn")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("NameKa")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Cities", (string)null);
+                });
+
             modelBuilder.Entity("Persons.Directory.Application.Domain.Person", b =>
                 {
                     b.Property<int>("Id")
@@ -33,9 +66,8 @@ namespace Persons.Directory.Persistence.Migrations
                     b.Property<DateTime>("BirthDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("CityId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
@@ -88,7 +120,8 @@ namespace Persons.Directory.Persistence.Migrations
 
                     b.Property<string>("Number")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<int>("NumberType")
                         .HasColumnType("int");
@@ -103,7 +136,7 @@ namespace Persons.Directory.Persistence.Migrations
 
                     b.HasIndex("PersonId");
 
-                    b.ToTable("PhoneNumber");
+                    b.ToTable("PhoneNumbers", (string)null);
                 });
 
             modelBuilder.Entity("Persons.Directory.Application.Domain.PhoneNumber", b =>

@@ -37,7 +37,6 @@ public class GetPersonDetailsQueryHandler : IRequestHandler<GetPersonDetailsRequ
                x.LastName,
                x.PersonalId,
                $"{x.BirthDate:dd-MM-yyyy}",
-               x.City,
                x.Image,
                x.RelatedPersonId,
                $"{x.Gender}",

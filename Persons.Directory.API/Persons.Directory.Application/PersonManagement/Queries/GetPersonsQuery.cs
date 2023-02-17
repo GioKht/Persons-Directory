@@ -27,7 +27,6 @@ public class GetPersonsQueryHandler : IRequestHandler<GetPersonsRequest, GetPers
             .And(request.BirthDate, x => x.BirthDate == request.BirthDate)
             .And(request.PhoneNumber, x => x.PhoneNumbers.Any(e => e.Number == request.PhoneNumber))
             .And(request.PhoneNumberType, x => x.PhoneNumbers.Any(e => e.NumberType == request.PhoneNumberType))
-            .And(request.City, x => x.City == request.City)
             .And(request.RelatedPersonId, x => x.RelatedPersonId == request.RelatedPersonId)
             .And(request.Gender, x => x.Gender == request.Gender)
             .And(request.RelatedType, x => x.RelatedType == request.RelatedType);
@@ -40,7 +39,6 @@ public class GetPersonsQueryHandler : IRequestHandler<GetPersonsRequest, GetPers
            x.LastName,
            x.PersonalId,
            $"{x.BirthDate:dd-MM-yyyy}",
-           x.City,
            x.Image,
            x.RelatedPersonId,
            $"{x.Gender}",
@@ -65,7 +63,7 @@ public class GetPersonsRequest : IQuery<GetPersonsResponse>, IPagedQuery
 
     public DateTime? BirthDate { get; set; }
 
-    public string? City { get; set; }
+    public int? CityId { get; set; }
 
     public string? PhoneNumber { get; set; }
 

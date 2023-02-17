@@ -16,7 +16,7 @@ public class Person : Entity
         LastName = request.LastName;
         PersonalId = request.PersonalId;
         BirthDate = request.BirthDate;
-        City = request.City;
+        CityId = request.CityId;
         Image = request.Image;
         RelatedPersonId = request.RelatedPersonId;
         Gender = request.Gender;
@@ -34,8 +34,23 @@ public class Person : Entity
     {
         FirstName = request.FirstName;
         LastName = request.LastName;
-        City = request.City;
+        CityId = request.CityId;
         UpdatedDate = DateTime.Now;
+
+        if (request.PhoneNumbers.Any())
+        {
+            var phoneNumbersList = new List<PhoneNumber>();
+
+            foreach (var phoneNumber in request.PhoneNumbers)
+            {
+                var dbPhoneNumber = PhoneNumbers.FirstOrDefault(x => x.Id == phoneNumber.Id);
+
+                if (dbPhoneNumber is not null)
+                {
+                    dbPhoneNumber.Update(phoneNumber);
+                }
+            }
+        }
     }
 
     public void SetRelatedPersonId()
@@ -51,7 +66,7 @@ public class Person : Entity
 
     public DateTime BirthDate { get; private set; }
 
-    public string City { get; private set; }
+    public int CityId { get; private set; }
 
     public int? RelatedPersonId { get; private set; }
 

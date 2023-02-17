@@ -17,6 +17,13 @@ public class PhoneNumber : Entity
         CreatedDate = DateTime.Now;
     }
 
+    public void Update(UpdatePhoneNumberModel model)
+    {
+        Number = model.Number;
+        NumberType = model.NumberType;
+        UpdatedDate = DateTime.Now;
+    }
+
     public string Number { get; private set; }
 
     public PhoneNumberType NumberType { get; private set; }

@@ -27,6 +27,11 @@ public class CreatePersonCommandHandler : IRequestHandler<CreatePersonRequest, U
 
 public class CreatePersonRequest : IRequest<Unit>
 {
+    public CreatePersonRequest()
+    {
+
+    }
+
     public string FirstName { get; set; }
 
     public string LastName { get; set; }
@@ -35,7 +40,7 @@ public class CreatePersonRequest : IRequest<Unit>
 
     public DateTime BirthDate { get; set; }
 
-    public string City { get; set; }
+    public int CityId { get; set; }
 
     public int? RelatedPersonId { get; set; }
 

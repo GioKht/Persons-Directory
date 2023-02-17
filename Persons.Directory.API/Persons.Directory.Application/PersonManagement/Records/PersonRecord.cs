@@ -9,7 +9,6 @@ public record PersonRecord(
     string LastName,
     string PersonalId,
     string BirthDate,
-    string City,
     string Image,
     int? RelatedPersonId,
     string Gender,
