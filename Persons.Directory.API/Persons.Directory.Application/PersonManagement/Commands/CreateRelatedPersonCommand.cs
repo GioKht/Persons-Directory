@@ -4,9 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Persons.Directory.Application.PersonManagement.Commands
+namespace Persons.Directory.Application.PersonManagement.Commands;
+
+internal class CreateRelatedPersonCommand
 {
-    internal class CreateRelatedPersonCommand
-    {
-    }
 }

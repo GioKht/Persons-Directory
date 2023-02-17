@@ -1,4 +1,5 @@
 ﻿using Persons.Directory.Application.Enums;
+using Persons.Directory.Application.PersonManagement.Commands;
 
 namespace Persons.Directory.Application.Domain;
 
@@ -6,33 +7,40 @@ public class Person : Entity
 {
     public Person()
     {
-
+        PhoneNumbers = new List<PhoneNumber>();
     }
 
-    public Person(
-        string firstName,
-        string lastName,
-        string personalId,
-        DateTime birthDate,
-        string city,
-        string phoneNumber,
-        string image,
-        Gender gender,
-        PhoneNumberType phoneNumberType,
-        RelatedType? relatedType = null,
-        int? relatedPersonId = null)
+    public Person(CreatePersonRequest request)
     {
-        FirstName = firstName;
-        LastName = lastName;
-        PersonalId = personalId;
-        BirthDate = birthDate;
-        City = city;
-        PhoneNumber = phoneNumber;
-        Image = image;
-        RelatedPersonId = relatedPersonId;
-        Gender = gender;
-        PhoneNumberType = phoneNumberType;
-        RelatedType = relatedType;
+        FirstName = request.FirstName;
+        LastName = request.LastName;
+        PersonalId = request.PersonalId;
+        BirthDate = request.BirthDate;
+        City = request.City;
+        Image = request.Image;
+        RelatedPersonId = request.RelatedPersonId;
+        Gender = request.Gender;
+        RelatedType = request.RelatedType;
+        CreatedDate = DateTime.Now;
+
+        if (request.PhoneNumbers.Any())
+        {
+            var phoneNumbers = request.PhoneNumbers.Select(number => new PhoneNumber(number));
+            PhoneNumbers = phoneNumbers.ToList();
+        }
+    }
+
+    public void SetValuesToUpdate(UpdatePersonRequest request)
+    {
+        FirstName = request.FirstName;
+        LastName = request.LastName;
+        City = request.City;
+        UpdatedDate = DateTime.Now;
+    }
+
+    public void SetRelatedPersonId()
+    {
+        RelatedPersonId = null;
     }
 
     public string FirstName { get; private set; }
@@ -45,15 +53,13 @@ public class Person : Entity
 
     public string City { get; private set; }
 
-    public string PhoneNumber { get; private set; }
-
     public int? RelatedPersonId { get; private set; }
 
-    public string Image { get; set; }
+    public string? Image { get; private set; }
 
     public Gender Gender { get; private set; }
 
-    public PhoneNumberType PhoneNumberType { get; private set; }
-
     public RelatedType? RelatedType { get; private set; }
+
+    public virtual ICollection<PhoneNumber> PhoneNumbers { get; private set; }
 }

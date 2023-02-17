@@ -2,6 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Persons.Directory.Application.Domain;
 using Persons.Directory.Application.Enums;
+using Persons.Directory.Application.PersonManagement.Commands;
+using Persons.Directory.Application.PersonManagement.Models;
 using Persons.Directory.Persistence.Db;
 
 namespace Persons.Directory.Persistence.Initializer;
@@ -32,35 +34,74 @@ public class DbInitializer
     {
         return new List<Person>
         {
-            new Person("Giorgi",
-            "Khutsishvili",
-            "01010101123",
-            new DateTime(1980, 01, 01),
-            "Tbilisi",
-            "577777777",
-            "",
-            Gender.Male,
-            PhoneNumberType.Mobile),
+            new Person(new CreatePersonRequest 
+            {
+                FirstName = "Giorgi",
+                LastName = "Khutsishvili",
+                PersonalId = "01010101123",
+                BirthDate = new DateTime(1980, 01, 01),
+                City = "Tbilisi",
+                Gender = Gender.Male,
+                PhoneNumbers = new List<PhoneNumberModel>()
+                {
+                    new PhoneNumberModel
+                    {
+                        Number = "57701490",
+                        NumberType = PhoneNumberType.Mobile,
+                    },
+                    new PhoneNumberModel
+                    {
+                        Number = "+0123456",
+                        NumberType = PhoneNumberType.Office
+                    }
+                }
+            }),
 
-            new Person("Nino",
-            "Goderdzishvili",
-            "01010101123",
-            new DateTime(1980, 01, 01),
-            "Tbilisi",
-            "577777777",
-            "",
-            Gender.Female,
-            PhoneNumberType.Mobile),
+            new Person(new CreatePersonRequest
+            {
+                FirstName = "Nino",
+                LastName = "Goderdzishvili",
+                PersonalId = "01010101123",
+                BirthDate = new DateTime(1980, 01, 01),
+                City = "Tbilisi",
+                Gender = Gender.Female,
+                PhoneNumbers = new List<PhoneNumberModel>()
+                {
+                    new PhoneNumberModel
+                    {
+                        Number = "577223344",
+                        NumberType = PhoneNumberType.Mobile
+                    },
+                    new PhoneNumberModel
+                    {
+                        Number = "+333123123123",
+                        NumberType = PhoneNumberType.Office
+                    }
+                }
+            }),
 
-            new Person("John",
-            "Doe",
-            "577777777",
-            new DateTime(1988, 05, 09),
-            "Batumi",
-            "577329090",
-            "",
-            Gender.Male,
-            PhoneNumberType.Mobile)
+            new Person(new CreatePersonRequest
+            {
+                FirstName = "John",
+                LastName = "Doe",
+                PersonalId = "01010101123",
+                BirthDate = new DateTime(1988, 05, 09),
+                City = "Tbilisi",
+                Gender = Gender.Male,
+                PhoneNumbers = new List<PhoneNumberModel>()
+                {
+                    new PhoneNumberModel
+                    {
+                        Number = "577443355",
+                        NumberType = PhoneNumberType.Mobile
+                    },
+                    new PhoneNumberModel
+                    {
+                        Number = "+1111111111111111",
+                        NumberType = PhoneNumberType.Office
+                    }
+                }
+            })
         };
     }
 }

@@ -1,12 +1,49 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MediatR;
+using Persons.Directory.Application.Domain;
+using Persons.Directory.Application.Enums;
+using Persons.Directory.Application.Interfaces;
+using Persons.Directory.Application.PersonManagement.Models;
 
-namespace Persons.Directory.Application.PersonManagement.Commands
+namespace Persons.Directory.Application.PersonManagement.Commands;
+
+public class CreatePersonCommandHandler : IRequestHandler<CreatePersonRequest, Unit>
 {
-    internal class CreatePersonCommand
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IRepository<Person> _repository;
+
+    public CreatePersonCommandHandler(IUnitOfWork unitOfWork)
+        => (_unitOfWork, _repository) = (unitOfWork, unitOfWork.GetRepository<Person>());
+
+    public async Task<Unit> Handle(CreatePersonRequest request, CancellationToken cancellationToken)
     {
+        Person person = new(request);
+
+        await _repository.InsertAsync(person);
+        await _unitOfWork.CommitAsync();
+
+        return new Unit();
     }
+}
+
+public class CreatePersonRequest : IRequest<Unit>
+{
+    public string FirstName { get; set; }
+
+    public string LastName { get; set; }
+
+    public string PersonalId { get; set; }
+
+    public DateTime BirthDate { get; set; }
+
+    public string City { get; set; }
+
+    public int? RelatedPersonId { get; set; }
+
+    public string? Image { get; set; }
+
+    public Gender Gender { get; set; }
+
+    public RelatedType? RelatedType { get; set; }
+
+    public IEnumerable<PhoneNumberModel> PhoneNumbers { get; set; }
 }

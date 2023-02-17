@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Persons.Directory.Application.Domain;
 
 namespace Persons.Directory.Application.TypeConfiguration;
@@ -15,5 +14,10 @@ public class PersonTypeConfiguration : IEntityTypeConfiguration<Person>
         builder.Property(x => x.FirstName).HasMaxLength(50);
         builder.Property(x => x.LastName).HasMaxLength(50);
         builder.Property(x => x.PersonalId).HasMaxLength(11);
+
+        builder.HasMany(x => x.PhoneNumbers)
+            .WithOne(x => x.Person)
+            .HasForeignKey(x => x.PersonId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

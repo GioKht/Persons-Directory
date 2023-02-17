@@ -4,6 +4,7 @@ using Persons.Directory.Application.Domain;
 using Persons.Directory.Application.Enums;
 using Persons.Directory.Application.Exceptions;
 using Persons.Directory.Application.Interfaces;
+using Persons.Directory.Application.PersonManagement.Models;
 using Persons.Directory.Application.PersonManagement.Records;
 using System.Net;
 
@@ -37,12 +38,15 @@ public class GetPersonDetailsQueryHandler : IRequestHandler<GetPersonDetailsRequ
                x.PersonalId,
                $"{x.BirthDate:dd-MM-yyyy}",
                x.City,
-               x.PhoneNumber,
                x.Image,
                x.RelatedPersonId,
                $"{x.Gender}",
-               $"{x.PhoneNumberType}",
-               $"{x.RelatedType}"));
+               $"{x.RelatedType}",
+               x.PhoneNumbers.Select(p => new PhoneNumberModel
+               {
+                   Number = p.Number,
+                   NumberType = p.NumberType
+               })));
         }
 
         return new GetPersonDetailsResponse
@@ -52,12 +56,16 @@ public class GetPersonDetailsQueryHandler : IRequestHandler<GetPersonDetailsRequ
             LastName = person.LastName,
             PersonalId = person.PersonalId,
             BirthDate = $"{person.BirthDate:dd-MM-yyyy}",
-            PhoneNumber = person.PhoneNumber,
             RelatedPersonId = person.RelatedPersonId,
             Image = person.Image,
             Gender = $"{person.Gender}",
             RelatedType = $"{person.RelatedType}",
-            RelatedPersons = relatedPersons
+            RelatedPersons = relatedPersons,
+            PhoneNumbers = person.PhoneNumbers.Select(p => new PhoneNumberModel
+            {
+                Number = p.Number,
+                NumberType = p.NumberType
+            })
         };
     }
 }
@@ -79,8 +87,6 @@ public class GetPersonDetailsResponse
 
     public string BirthDate { get; set; }
 
-    public string PhoneNumber { get; set; }
-
     public int? RelatedPersonId { get; set; }
 
     public string Image { get; set; }
@@ -88,6 +94,8 @@ public class GetPersonDetailsResponse
     public string Gender { get; set; }
 
     public string RelatedType { get; set; }
+
+    public IEnumerable<PhoneNumberModel> PhoneNumbers { get; set; }
 
     public IEnumerable<PersonRecord> RelatedPersons { get; set; }
 }

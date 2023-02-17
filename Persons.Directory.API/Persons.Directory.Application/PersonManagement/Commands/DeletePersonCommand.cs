@@ -1,12 +1,45 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
+using Persons.Directory.Application.Domain;
+using Persons.Directory.Application.Exceptions;
+using Persons.Directory.Application.Interfaces;
+using System.Net;
 
-namespace Persons.Directory.Application.PersonManagement.Commands
+namespace Persons.Directory.Application.PersonManagement.Commands;
+
+public class DeletePersonCommandHandler : IRequestHandler<DeletePersonRequest, Unit>
 {
-    internal class DeletePersonCommand
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IRepository<Person> _repository;
+
+    public DeletePersonCommandHandler(IUnitOfWork unitOfWork)
+        => (_unitOfWork, _repository) = (unitOfWork, unitOfWork.GetRepository<Person>());
+
+    public async Task<Unit> Handle(DeletePersonRequest request, CancellationToken cancellationToken)
     {
+        var person = await _repository.GetAsync(request.Id);
+
+        if (person is null)
+        {
+            throw new HttpException($"Person not found by Id: {request.Id}", HttpStatusCode.NotFound);
+        }
+
+        var relatedPersons = await _repository.QueryAsync(x => x.RelatedPersonId.HasValue && 
+                                                               x.RelatedPersonId.Value == person.Id);
+
+        if (relatedPersons.Any())
+        {
+            await relatedPersons.ForEachAsync(x => x.SetRelatedPersonId());
+        }
+
+        _repository.Delete(person);
+        await _unitOfWork.CommitAsync();
+
+        return new Unit();
     }
+}
+
+public class DeletePersonRequest : IRequest<Unit>
+{
+    public int Id { get; set; }
 }
