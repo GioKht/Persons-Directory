@@ -30,7 +30,12 @@ namespace Persons.Directory.API.Controllers
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async  Task<IActionResult> Create([FromBody] CreatePersonRequest request) 
+        public async Task<IActionResult> Create([FromBody] CreatePersonRequest request)
+            => Ok(await _mediator.Send(request));
+
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> AddRelatedPerson([FromBody] AddRelatedPersonRequest request)
             => Ok(await _mediator.Send(request));
 
         [Route("{id}")]
@@ -43,10 +48,32 @@ namespace Persons.Directory.API.Controllers
             return Ok(await _mediator.Send(request));
         }
 
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> UploadImage([Required] int id, [Required] IFormFile file)
+            => Ok(await _mediator.Send(new UploadPersonImageRequest
+            {
+                Id = id,
+                File = file
+            }));
+
         [Route("{id}")]
         [HttpDelete]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Delete([Required] int id)
-            => Ok(await _mediator.Send(new DeletePersonRequest { Id = id }));
+            => Ok(await _mediator.Send(new DeletePersonRequest
+            {
+                Id = id
+            }));
+
+        [Route("{personId}/{relatedPersonId}")]
+        [HttpDelete]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> DeleteRelatedPerson([Required] int personId, [Required] int relatedPersonId)
+           => Ok(await _mediator.Send(new DeleteRelatedPersonRequest
+           {
+               PersonId = personId,
+               RelatedPersonId = relatedPersonId
+           }));
     }
 }

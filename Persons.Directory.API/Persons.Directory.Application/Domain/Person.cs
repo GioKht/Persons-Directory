@@ -1,4 +1,5 @@
-﻿using Persons.Directory.Application.Enums;
+﻿using Microsoft.AspNetCore.Http;
+using Persons.Directory.Application.Enums;
 using Persons.Directory.Application.PersonManagement.Commands;
 
 namespace Persons.Directory.Application.Domain;
@@ -17,10 +18,7 @@ public class Person : Entity
         PersonalId = request.PersonalId;
         BirthDate = request.BirthDate;
         CityId = request.CityId;
-        Image = request.Image;
-        RelatedPersonId = request.RelatedPersonId;
         Gender = request.Gender;
-        RelatedType = request.RelatedType;
         CreatedDate = DateTime.Now;
 
         if (request.PhoneNumbers.Any())
@@ -58,6 +56,31 @@ public class Person : Entity
         RelatedPersonId = null;
     }
 
+    public void SetRelatedPersonId(int relatedPersonId)
+    {
+        RelatedPersonId = relatedPersonId;
+    }
+
+    public void SetRelatedType(RelatedType relatedType)
+    {
+        RelatedType = relatedType;
+    }
+
+    public string GetImage(IHttpContextAccessor httpContextAccessor)
+    {
+        string fileName = $"{FirstName}_{LastName}_{Id}.jpg";
+
+        var imagePath = Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot", "images", fileName);
+        var result = File.Exists(imagePath);
+
+        if (result)
+        {
+            return $"{httpContextAccessor.HttpContext.Request.Scheme}://{httpContextAccessor.HttpContext.Request.Host.Value}/images/{fileName}";
+        }
+
+        return null;
+    }
+
     public string FirstName { get; private set; }
 
     public string LastName { get; private set; }
@@ -69,8 +92,6 @@ public class Person : Entity
     public int CityId { get; private set; }
 
     public int? RelatedPersonId { get; private set; }
-
-    public string? Image { get; private set; }
 
     public Gender Gender { get; private set; }
 

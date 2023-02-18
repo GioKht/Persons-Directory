@@ -15,6 +15,8 @@ public interface IRepository<TEntity> where TEntity : Entity
 
     Task<IDictionary<int, TEntity>> ToDictionaryAsync();
 
+    Task<TEntity> FirstOrDefaultAsync(Expression<Func<TEntity, bool>>? expression = null);
+
     IQueryable<TEntity> Query(Expression<Func<TEntity, bool>>? expression = null);
 
     Task<IQueryable<TEntity>> QueryAsync(Expression<Func<TEntity, bool>>? expression = null);

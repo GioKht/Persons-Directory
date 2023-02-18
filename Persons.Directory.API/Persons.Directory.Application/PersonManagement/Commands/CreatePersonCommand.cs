@@ -42,13 +42,7 @@ public class CreatePersonRequest : IRequest<Unit>
 
     public int CityId { get; set; }
 
-    public int? RelatedPersonId { get; set; }
-
-    public string? Image { get; set; }
-
     public Gender Gender { get; set; }
-
-    public RelatedType? RelatedType { get; set; }
 
     public IEnumerable<PhoneNumberModel> PhoneNumbers { get; set; }
 }

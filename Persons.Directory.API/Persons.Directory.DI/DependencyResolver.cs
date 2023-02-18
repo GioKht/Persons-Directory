@@ -18,6 +18,7 @@ public class DependencyResolver
             .AddMediatR(typeof(ApplicationProgram))
             .AddFluentValidation()
             .AddApplicationServices()
-            .AddApplicationDbContext(connectionString);
+            .AddApplicationDbContext(connectionString)
+            .AddHttpContextAccessor();
     }
 }

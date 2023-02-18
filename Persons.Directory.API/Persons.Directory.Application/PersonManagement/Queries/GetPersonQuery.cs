@@ -1,7 +1,7 @@
 ﻿using Application.Infrastructure;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Persons.Directory.Application.Domain;
-using Persons.Directory.Application.Enums;
 using Persons.Directory.Application.Exceptions;
 using Persons.Directory.Application.Interfaces;
 using Persons.Directory.Application.PersonManagement.Models;
@@ -13,8 +13,11 @@ namespace Persons.Directory.Application.PersonManagement.Queries;
 public class GetPersonDetailsQueryHandler : IRequestHandler<GetPersonDetailsRequest, GetPersonDetailsResponse>
 {
     private readonly IRepository<Person> _repository;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public GetPersonDetailsQueryHandler(IUnitOfWork unitOfWork) => _repository = unitOfWork.GetRepository<Person>();
+    public GetPersonDetailsQueryHandler(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor) 
+        => (_repository, _httpContextAccessor) 
+        = (unitOfWork.GetRepository<Person>(), httpContextAccessor);
 
     public async Task<GetPersonDetailsResponse> Handle(GetPersonDetailsRequest request, CancellationToken cancellationToken)
     {
@@ -37,7 +40,7 @@ public class GetPersonDetailsQueryHandler : IRequestHandler<GetPersonDetailsRequ
                x.LastName,
                x.PersonalId,
                $"{x.BirthDate:dd-MM-yyyy}",
-               x.Image,
+               x.GetImage(_httpContextAccessor),
                x.RelatedPersonId,
                $"{x.Gender}",
                $"{x.RelatedType}",
@@ -56,7 +59,7 @@ public class GetPersonDetailsQueryHandler : IRequestHandler<GetPersonDetailsRequ
             PersonalId = person.PersonalId,
             BirthDate = $"{person.BirthDate:dd-MM-yyyy}",
             RelatedPersonId = person.RelatedPersonId,
-            Image = person.Image,
+            Image = person.GetImage(_httpContextAccessor),
             Gender = $"{person.Gender}",
             RelatedType = $"{person.RelatedType}",
             RelatedPersons = relatedPersons,

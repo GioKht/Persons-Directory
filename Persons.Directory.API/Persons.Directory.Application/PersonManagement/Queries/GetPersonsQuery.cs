@@ -1,6 +1,7 @@
 ﻿using Application.Infrastructure;
 using Application.Infrastructure.Enums;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Persons.Directory.Application.Domain;
 using Persons.Directory.Application.Enums;
@@ -13,8 +14,10 @@ namespace Persons.Directory.Application.PersonManagement.Queries;
 public class GetPersonsQueryHandler : IRequestHandler<GetPersonsRequest, GetPersonsResponse>
 {
     private readonly IRepository<Person> _repository;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public GetPersonsQueryHandler(IUnitOfWork unitOfWork) => _repository = unitOfWork.GetRepository<Person>();
+    public GetPersonsQueryHandler(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor) 
+        => (_repository, _httpContextAccessor) = (unitOfWork.GetRepository<Person>(), httpContextAccessor);
 
     public async Task<GetPersonsResponse> Handle(GetPersonsRequest request, CancellationToken cancellationToken)
     {
@@ -33,21 +36,25 @@ public class GetPersonsQueryHandler : IRequestHandler<GetPersonsRequest, GetPers
 
         var totalCount = baseQuery.Count();
 
-        var persons = await baseQuery.SortAndPage(request).Select(x => new PersonRecord(
-           x.Id,
-           x.FirstName,
-           x.LastName,
-           x.PersonalId,
-           $"{x.BirthDate:dd-MM-yyyy}",
-           x.Image,
-           x.RelatedPersonId,
-           $"{x.Gender}",
-           $"{x.RelatedType}",
-           x.PhoneNumbers.Select(p => new PhoneNumberModel
-           {
-               Number = p.Number,
-               NumberType = p.NumberType
-           }))).ToListAsync();
+        var persons = await baseQuery
+            .SortAndPage(request)
+            .Select(x => new PersonRecord(
+                x.Id,
+                x.FirstName,
+                x.LastName,
+                x.PersonalId,
+                $"{x.BirthDate:dd-MM-yyyy}",
+                x.GetImage(_httpContextAccessor),
+                x.RelatedPersonId,
+                $"{x.Gender}",
+                $"{x.RelatedType}",
+                x.PhoneNumbers.Select(p => new PhoneNumberModel
+                {
+                    Number = p.Number,
+                    NumberType = p.NumberType
+                })
+            ))
+            .ToListAsync();
 
         return new GetPersonsResponse
         {

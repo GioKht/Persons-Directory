@@ -47,6 +47,16 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : Entity
         return await _db.Set<TEntity>().ToDictionaryAsync(x => x.Id);
     }
 
+    public async Task<TEntity> FirstOrDefaultAsync(Expression<Func<TEntity, bool>>? expression = null)
+    {
+        if (expression == null)
+        {
+            return await _db.Set<TEntity>().FirstOrDefaultAsync();
+        }
+
+        return await _db.Set<TEntity>().FirstOrDefaultAsync(expression);
+    }
+
     public IQueryable<TEntity> Query(Expression<Func<TEntity, bool>>? expression = null)
     {
         if (expression == null)
