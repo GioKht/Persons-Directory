@@ -61,6 +61,11 @@ public class Person : Entity
         RelatedPersonId = relatedPersonId;
     }
 
+    public void SetRelatedType()
+    {
+        RelatedType = null;
+    }
+
     public void SetRelatedType(RelatedType relatedType)
     {
         RelatedType = relatedType;

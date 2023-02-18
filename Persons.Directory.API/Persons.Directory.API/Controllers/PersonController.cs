@@ -35,7 +35,7 @@ namespace Persons.Directory.API.Controllers
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> AddRelatedPerson([FromBody] AddRelatedPersonRequest request)
+        public async Task<IActionResult> CreateRelationship([FromBody] CreatePersonRelationshipRequest request)
             => Ok(await _mediator.Send(request));
 
         [Route("{id}")]

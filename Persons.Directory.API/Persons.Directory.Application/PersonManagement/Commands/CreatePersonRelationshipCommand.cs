@@ -7,29 +7,32 @@ using System.Net;
 
 namespace Persons.Directory.Application.PersonManagement.Commands;
 
-public class AddRelatedPersonHandler : IRequestHandler<AddRelatedPersonRequest, Unit>
+public class CreatePersonRelationshipCommandHandler : IRequestHandler<CreatePersonRelationshipRequest, Unit>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IRepository<Person> _repository;
 
-    public AddRelatedPersonHandler(IUnitOfWork unitOfWork)
+    public CreatePersonRelationshipCommandHandler(IUnitOfWork unitOfWork)
         => (_unitOfWork, _repository) = (unitOfWork, unitOfWork.GetRepository<Person>());
 
-    public async Task<Unit> Handle(AddRelatedPersonRequest request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(CreatePersonRelationshipRequest request, CancellationToken cancellationToken)
     {
         var person = await _repository.GetAsync(request.PersonId);
 
         if (person is null)
         {
-            throw new HttpException($"Add related person failed, person not found by Id: {request.PersonId}", HttpStatusCode.NotFound);
+            throw new HttpException($"Person not found by Id: {request.PersonId}", HttpStatusCode.NotFound);
         }
 
         var relatedPerson = await _repository.GetAsync(request.RelatedPersonId);
 
         if (relatedPerson is null)
         {
-            throw new HttpException($"Add related person failed, relatedPerson not found by Id: {request.RelatedPersonId}", HttpStatusCode.NotFound);
+            throw new HttpException($"RelatedPerson not found by Id: {request.RelatedPersonId}", HttpStatusCode.NotFound);
         }
+
+        person.SetRelatedPersonId(relatedPerson.Id);
+        person.SetRelatedType(request.RelatedType);
 
         relatedPerson.SetRelatedPersonId(person.Id);
         relatedPerson.SetRelatedType(request.RelatedType);
@@ -40,7 +43,7 @@ public class AddRelatedPersonHandler : IRequestHandler<AddRelatedPersonRequest, 
     }
 }
 
-public class AddRelatedPersonRequest : IRequest<Unit>
+public class CreatePersonRelationshipRequest : IRequest<Unit>
 {
     public int PersonId { get; set; }
 
