@@ -8,6 +8,7 @@ public class Person : Entity
 {
     public Person()
     {
+        RelatedPersons = new List<PersonRelation>();
         PhoneNumbers = new List<PhoneNumber>();
     }
 
@@ -51,26 +52,6 @@ public class Person : Entity
         }
     }
 
-    public void SetRelatedPersonId()
-    {
-        RelatedPersonId = null;
-    }
-
-    public void SetRelatedPersonId(int relatedPersonId)
-    {
-        RelatedPersonId = relatedPersonId;
-    }
-
-    public void SetRelatedType()
-    {
-        RelatedType = null;
-    }
-
-    public void SetRelatedType(RelatedType relatedType)
-    {
-        RelatedType = relatedType;
-    }
-
     public string GetImage(IHttpContextAccessor httpContextAccessor)
     {
         string fileName = $"{FirstName}_{LastName}_{Id}.jpg";
@@ -96,11 +77,11 @@ public class Person : Entity
 
     public int CityId { get; private set; }
 
-    public int? RelatedPersonId { get; private set; }
-
     public Gender Gender { get; private set; }
 
-    public RelatedType? RelatedType { get; private set; }
+    public virtual ICollection<PersonRelation> RelatedPersons { get; private set; }
+
+    public virtual ICollection<PersonRelation> RelatedToPersons { get; private set; }
 
     public virtual ICollection<PhoneNumber> PhoneNumbers { get; private set; }
 }

@@ -6,6 +6,7 @@ using Persons.Directory.Application.Exceptions;
 using Persons.Directory.Application.Interfaces;
 using Persons.Directory.Application.PersonManagement.Models;
 using Persons.Directory.Application.PersonManagement.Records;
+using Persons.Directory.Application.Shared.Records;
 using System.Net;
 
 namespace Persons.Directory.Application.PersonManagement.Queries;
@@ -15,8 +16,8 @@ public class GetPersonDetailsQueryHandler : IRequestHandler<GetPersonDetailsRequ
     private readonly IRepository<Person> _repository;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public GetPersonDetailsQueryHandler(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor) 
-        => (_repository, _httpContextAccessor) 
+    public GetPersonDetailsQueryHandler(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor)
+        => (_repository, _httpContextAccessor)
         = (unitOfWork.GetRepository<Person>(), httpContextAccessor);
 
     public async Task<GetPersonDetailsResponse> Handle(GetPersonDetailsRequest request, CancellationToken cancellationToken)
@@ -28,29 +29,6 @@ public class GetPersonDetailsQueryHandler : IRequestHandler<GetPersonDetailsRequ
             throw new HttpException($"Person not found by Id: {request.Id}", HttpStatusCode.NotFound);
         }
 
-        var dbRelatedPersons = await _repository.QueryAsync(x => x.RelatedPersonId == person.Id);
-
-        var relatedPersons = Enumerable.Empty<PersonRecord>();
-
-        if (dbRelatedPersons.Any())
-        {
-            relatedPersons = dbRelatedPersons.Select(x => new PersonRecord(
-               x.Id,
-               x.FirstName,
-               x.LastName,
-               x.PersonalId,
-               $"{x.BirthDate:dd-MM-yyyy}",
-               x.GetImage(_httpContextAccessor),
-               x.RelatedPersonId,
-               $"{x.Gender}",
-               $"{x.RelatedType}",
-               x.PhoneNumbers.Select(p => new PhoneNumberModel
-               {
-                   Number = p.Number,
-                   NumberType = p.NumberType
-               })));
-        }
-
         return new GetPersonDetailsResponse
         {
             Id = person.Id,
@@ -58,11 +36,27 @@ public class GetPersonDetailsQueryHandler : IRequestHandler<GetPersonDetailsRequ
             LastName = person.LastName,
             PersonalId = person.PersonalId,
             BirthDate = $"{person.BirthDate:dd-MM-yyyy}",
-            RelatedPersonId = person.RelatedPersonId,
             Image = person.GetImage(_httpContextAccessor),
             Gender = $"{person.Gender}",
-            RelatedType = $"{person.RelatedType}",
-            RelatedPersons = relatedPersons,
+
+            RelatedPersons = person.RelatedPersons.Select(p => new RelatedPersonRecord(
+                        p.RelatedPerson.FirstName,
+                        p.RelatedPerson.LastName,
+                        p.RelatedPerson.PersonalId,
+                        $"{p.RelatedPerson.BirthDate:dd-MM-yyyy}",
+                        p.RelatedPerson.GetImage(_httpContextAccessor),
+                        $"{p.RelatedPerson.Gender}",
+                        $"{p.RelatedType}")),
+
+            RelatedToPersons = person.RelatedToPersons.Select(p => new RelatedPersonRecord(
+                     p.Person.FirstName,
+                     p.Person.LastName,
+                     p.Person.PersonalId,
+                     $"{p.Person.BirthDate:dd-MM-yyyy}",
+                     p.Person.GetImage(_httpContextAccessor),
+                     $"{p.Person.Gender}",
+                     $"{p.RelatedType}")),
+
             PhoneNumbers = person.PhoneNumbers.Select(p => new PhoneNumberModel
             {
                 Number = p.Number,
@@ -97,7 +91,10 @@ public class GetPersonDetailsResponse
 
     public string RelatedType { get; set; }
 
+    public IEnumerable<RelatedPersonRecord> RelatedPersons { get; set; }
+
+    public IEnumerable<RelatedPersonRecord> RelatedToPersons { get; set; }
+
     public IEnumerable<PhoneNumberModel> PhoneNumbers { get; set; }
 
-    public IEnumerable<PersonRecord> RelatedPersons { get; set; }
 }

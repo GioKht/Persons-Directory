@@ -1,14 +1,8 @@
 ﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Persons.Directory.Application.Domain;
 using Persons.Directory.Application.Exceptions;
 using Persons.Directory.Application.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Persons.Directory.Application.PersonManagement.Commands;
 
@@ -22,32 +16,20 @@ public class DeleteRelatedPersonCommandHandler : IRequestHandler<DeleteRelatedPe
 
     public async Task<Unit> Handle(DeleteRelatedPersonRequest request, CancellationToken cancellationToken)
     {
-        var person = await _repository.FirstOrDefaultAsync(x => x.Id == request.PersonId &&
-                                                                x.RelatedPersonId.HasValue &&
-                                                                x.RelatedPersonId.Value == request.RelatedPersonId);
-
+        var person = await _repository.GetAsync(request.PersonId);
         if (person is null)
         {
             throw new HttpException($"Delete related person failed", HttpStatusCode.NotFound);
         }
 
-        var relatedPerson = await _repository.GetAsync(person.RelatedPersonId.Value);
+        var relatedPerson = person.RelatedPersons.FirstOrDefault(x => x.RelatedPersonId == request.RelatedPersonId);
         if (relatedPerson is null)
         {
-            throw new HttpException($"Related person not found by Id: {person.RelatedPersonId.Value}", HttpStatusCode.NotFound);
+            throw new HttpException($"Related person not found by Id: {request.RelatedPersonId}", HttpStatusCode.NotFound);
         }
 
-        person.SetRelatedPersonId();
+        person.RelatedPersons.Remove(relatedPerson);
 
-        var relatedPersons = await _repository.QueryAsync(x => x.RelatedPersonId.HasValue &&
-                                                               x.RelatedPersonId.Value == relatedPerson.Id);
-
-        if (relatedPersons.Any())
-        {
-            await relatedPersons.ForEachAsync(x => x.SetRelatedPersonId());
-        }
-
-        _repository.Delete(relatedPerson);
         await _unitOfWork.CommitAsync();
 
         return new Unit();

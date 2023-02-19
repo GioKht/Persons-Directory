@@ -18,24 +18,21 @@ public class CreatePersonRelationshipCommandHandler : IRequestHandler<CreatePers
     public async Task<Unit> Handle(CreatePersonRelationshipRequest request, CancellationToken cancellationToken)
     {
         var person = await _repository.GetAsync(request.PersonId);
-
         if (person is null)
         {
             throw new HttpException($"Person not found by Id: {request.PersonId}", HttpStatusCode.NotFound);
         }
 
         var relatedPerson = await _repository.GetAsync(request.RelatedPersonId);
-
         if (relatedPerson is null)
         {
             throw new HttpException($"RelatedPerson not found by Id: {request.RelatedPersonId}", HttpStatusCode.NotFound);
         }
 
-        person.SetRelatedPersonId(relatedPerson.Id);
-        person.SetRelatedType(request.RelatedType);
+        var personRelation = new PersonRelation(person, relatedPerson, request.RelatedType);
 
-        relatedPerson.SetRelatedPersonId(person.Id);
-        relatedPerson.SetRelatedType(request.RelatedType);
+        person.RelatedPersons.Add(personRelation);
+        relatedPerson.RelatedToPersons.Add(personRelation);
 
         await _unitOfWork.CommitAsync();
 

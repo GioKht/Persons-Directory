@@ -8,6 +8,7 @@ using Persons.Directory.Application.Enums;
 using Persons.Directory.Application.Interfaces;
 using Persons.Directory.Application.PersonManagement.Models;
 using Persons.Directory.Application.PersonManagement.Records;
+using Persons.Directory.Application.Shared.Records;
 
 namespace Persons.Directory.Application.PersonManagement.Queries;
 
@@ -16,7 +17,7 @@ public class GetPersonsQueryHandler : IRequestHandler<GetPersonsRequest, GetPers
     private readonly IRepository<Person> _repository;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public GetPersonsQueryHandler(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor) 
+    public GetPersonsQueryHandler(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor)
         => (_repository, _httpContextAccessor) = (unitOfWork.GetRepository<Person>(), httpContextAccessor);
 
     public async Task<GetPersonsResponse> Handle(GetPersonsRequest request, CancellationToken cancellationToken)
@@ -30,13 +31,13 @@ public class GetPersonsQueryHandler : IRequestHandler<GetPersonsRequest, GetPers
             .And(request.BirthDate, x => x.BirthDate == request.BirthDate)
             .And(request.PhoneNumber, x => x.PhoneNumbers.Any(e => e.Number == request.PhoneNumber))
             .And(request.PhoneNumberType, x => x.PhoneNumbers.Any(e => e.NumberType == request.PhoneNumberType))
-            .And(request.RelatedPersonId, x => x.RelatedPersonId == request.RelatedPersonId)
-            .And(request.Gender, x => x.Gender == request.Gender)
-            .And(request.RelatedType, x => x.RelatedType == request.RelatedType);
+            .And(request.Gender, x => x.Gender == request.Gender);
 
         var totalCount = baseQuery.Count();
 
         var persons = await baseQuery
+            .Include(p => p.RelatedPersons)
+            .ThenInclude(pr => pr.RelatedPerson)
             .SortAndPage(request)
             .Select(x => new PersonRecord(
                 x.Id,
@@ -45,9 +46,26 @@ public class GetPersonsQueryHandler : IRequestHandler<GetPersonsRequest, GetPers
                 x.PersonalId,
                 $"{x.BirthDate:dd-MM-yyyy}",
                 x.GetImage(_httpContextAccessor),
-                x.RelatedPersonId,
                 $"{x.Gender}",
-                $"{x.RelatedType}",
+
+                x.RelatedPersons.Select(p => new RelatedPersonRecord(
+                        p.RelatedPerson.FirstName,
+                        p.RelatedPerson.LastName,
+                        p.RelatedPerson.PersonalId,
+                        $"{p.RelatedPerson.BirthDate:dd-MM-yyyy}",
+                        p.RelatedPerson.GetImage(_httpContextAccessor),
+                        $"{p.RelatedPerson.Gender}",
+                        $"{p.RelatedType}")),
+
+                x.RelatedToPersons.Select(p => new RelatedPersonRecord(
+                        p.Person.FirstName,
+                        p.Person.LastName,
+                        p.Person.PersonalId,
+                        $"{p.Person.BirthDate:dd-MM-yyyy}",
+                        p.Person.GetImage(_httpContextAccessor),
+                        $"{p.Person.Gender}",
+                        $"{p.RelatedType}")),
+
                 x.PhoneNumbers.Select(p => new PhoneNumberModel
                 {
                     Number = p.Number,

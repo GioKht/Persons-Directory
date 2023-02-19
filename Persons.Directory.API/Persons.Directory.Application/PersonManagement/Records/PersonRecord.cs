@@ -1,5 +1,5 @@
-﻿using Persons.Directory.Application.Enums;
-using Persons.Directory.Application.PersonManagement.Models;
+﻿using Persons.Directory.Application.PersonManagement.Models;
+using Persons.Directory.Application.Shared.Records;
 
 namespace Persons.Directory.Application.PersonManagement.Records;
 
@@ -10,7 +10,7 @@ public record PersonRecord(
     string PersonalId,
     string BirthDate,
     string Image,
-    int? RelatedPersonId,
     string Gender,
-    string RelatedType,
+    IEnumerable<RelatedPersonRecord> RelatedPersons, 
+    IEnumerable<RelatedPersonRecord> RelatedToPersons, 
     IEnumerable<PhoneNumberModel> PhoneNumbers);

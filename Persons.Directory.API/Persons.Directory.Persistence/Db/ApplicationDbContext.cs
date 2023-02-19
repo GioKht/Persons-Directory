@@ -14,6 +14,7 @@ namespace Persons.Directory.Persistence.Db
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new PersonTypeConfiguration())
+                        .ApplyConfiguration(new PersonRelationTypeConfiguration())
                         .ApplyConfiguration(new PhoneNumberTypeConfiguration())
                         .ApplyConfiguration(new CityTypeConfiguration());
         }

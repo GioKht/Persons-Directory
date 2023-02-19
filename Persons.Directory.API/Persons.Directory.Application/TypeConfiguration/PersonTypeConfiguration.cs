@@ -19,5 +19,15 @@ public class PersonTypeConfiguration : IEntityTypeConfiguration<Person>
             .WithOne(x => x.Person)
             .HasForeignKey(x => x.PersonId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(p => p.RelatedPersons)
+            .WithOne(pr => pr.Person)
+            .HasForeignKey(pr => pr.PersonId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(p => p.RelatedToPersons)
+            .WithOne(pr => pr.RelatedPerson)
+            .HasForeignKey(pr => pr.RelatedPersonId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

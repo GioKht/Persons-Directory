@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Persons.Directory.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class IntialCreate : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -39,16 +39,38 @@ namespace Persons.Directory.Persistence.Migrations
                     PersonalId = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: false),
                     BirthDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CityId = table.Column<int>(type: "int", nullable: false),
-                    RelatedPersonId = table.Column<int>(type: "int", nullable: true),
-                    Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Gender = table.Column<int>(type: "int", nullable: false),
-                    RelatedType = table.Column<int>(type: "int", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Persons", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PersonRelation",
+                columns: table => new
+                {
+                    PersonId = table.Column<int>(type: "int", nullable: false),
+                    RelatedPersonId = table.Column<int>(type: "int", nullable: false),
+                    RelatedType = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PersonRelation", x => new { x.PersonId, x.RelatedPersonId });
+                    table.ForeignKey(
+                        name: "FK_PersonRelation_Persons_PersonId",
+                        column: x => x.PersonId,
+                        principalTable: "Persons",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PersonRelation_Persons_RelatedPersonId",
+                        column: x => x.RelatedPersonId,
+                        principalTable: "Persons",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -75,6 +97,11 @@ namespace Persons.Directory.Persistence.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_PersonRelation_RelatedPersonId",
+                table: "PersonRelation",
+                column: "RelatedPersonId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PhoneNumbers_PersonId",
                 table: "PhoneNumbers",
                 column: "PersonId");
@@ -85,6 +112,9 @@ namespace Persons.Directory.Persistence.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Cities");
+
+            migrationBuilder.DropTable(
+                name: "PersonRelation");
 
             migrationBuilder.DropTable(
                 name: "PhoneNumbers");

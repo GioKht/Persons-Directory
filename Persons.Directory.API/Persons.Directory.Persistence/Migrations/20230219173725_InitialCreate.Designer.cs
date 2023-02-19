@@ -12,8 +12,8 @@ using Persons.Directory.Persistence.Db;
 namespace Persons.Directory.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230218195012_RemoverRedundantImgProp")]
-    partial class RemoverRedundantImgProp
+    [Migration("20230219173725_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -93,18 +93,30 @@ namespace Persons.Directory.Persistence.Migrations
                         .HasMaxLength(11)
                         .HasColumnType("nvarchar(11)");
 
-                    b.Property<int?>("RelatedPersonId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("RelatedType")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
                     b.ToTable("Persons", (string)null);
+                });
+
+            modelBuilder.Entity("Persons.Directory.Application.Domain.PersonRelation", b =>
+                {
+                    b.Property<int>("PersonId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RelatedPersonId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RelatedType")
+                        .HasColumnType("int");
+
+                    b.HasKey("PersonId", "RelatedPersonId");
+
+                    b.HasIndex("RelatedPersonId");
+
+                    b.ToTable("PersonRelation");
                 });
 
             modelBuilder.Entity("Persons.Directory.Application.Domain.PhoneNumber", b =>
@@ -139,6 +151,25 @@ namespace Persons.Directory.Persistence.Migrations
                     b.ToTable("PhoneNumbers", (string)null);
                 });
 
+            modelBuilder.Entity("Persons.Directory.Application.Domain.PersonRelation", b =>
+                {
+                    b.HasOne("Persons.Directory.Application.Domain.Person", "Person")
+                        .WithMany("RelatedPersons")
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Persons.Directory.Application.Domain.Person", "RelatedPerson")
+                        .WithMany("RelatedToPersons")
+                        .HasForeignKey("RelatedPersonId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Person");
+
+                    b.Navigation("RelatedPerson");
+                });
+
             modelBuilder.Entity("Persons.Directory.Application.Domain.PhoneNumber", b =>
                 {
                     b.HasOne("Persons.Directory.Application.Domain.Person", "Person")
@@ -153,6 +184,10 @@ namespace Persons.Directory.Persistence.Migrations
             modelBuilder.Entity("Persons.Directory.Application.Domain.Person", b =>
                 {
                     b.Navigation("PhoneNumbers");
+
+                    b.Navigation("RelatedPersons");
+
+                    b.Navigation("RelatedToPersons");
                 });
 #pragma warning restore 612, 618
         }

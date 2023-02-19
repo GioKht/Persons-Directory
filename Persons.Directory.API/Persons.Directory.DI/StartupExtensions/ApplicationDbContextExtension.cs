@@ -10,7 +10,7 @@ namespace Persons.Directory.DI.StartupExtensions
 
         public static IServiceCollection AddApplicationDbContext(this IServiceCollection services, string connectionString)
         {
-            services.AddDbContext<ApplicationDbContext>(options 
+            services.AddDbContext<ApplicationDbContext>(options
                 => options.UseSqlServer(connectionString, b => b.MigrationsAssembly(assembly))
                           .UseLazyLoadingProxies());
 

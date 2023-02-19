@@ -24,14 +24,6 @@ public class DeletePersonCommandHandler : IRequestHandler<DeletePersonRequest, U
             throw new HttpException($"Person not found by Id: {request.Id}", HttpStatusCode.NotFound);
         }
 
-        var relatedPersons = await _repository.QueryAsync(x => x.RelatedPersonId.HasValue && 
-                                                               x.RelatedPersonId.Value == person.Id);
-
-        if (relatedPersons.Any())
-        {
-            await relatedPersons.ForEachAsync(x => x.SetRelatedPersonId());
-        }
-
         _repository.Delete(person);
         await _unitOfWork.CommitAsync();
 
