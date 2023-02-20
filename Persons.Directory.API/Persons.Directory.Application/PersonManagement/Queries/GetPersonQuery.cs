@@ -26,7 +26,7 @@ public class GetPersonDetailsQueryHandler : IRequestHandler<GetPersonDetailsRequ
 
         if (person is null)
         {
-            throw new HttpException($"Person not found by Id: {request.Id}", HttpStatusCode.NotFound);
+            throw new BadRequestException($"Person not found by Id: {request.Id}", HttpStatusCode.NotFound);
         }
 
         return new GetPersonDetailsResponse

@@ -24,37 +24,44 @@ namespace Persons.Directory.Application.ReportManagement.Queries
                                               x.LastName.Contains(request.SearchTerm) ||
                                               x.PersonalId.Contains(request.SearchTerm));
 
-            var persons = await baseQuery
-                .SortAndPage(request)
-                .ToListAsync();
+            var persons = await baseQuery.SortAndPage(request).ToListAsync();
 
-            var items = persons.GroupBy(p => new { p.Id, p.FirstName, p.LastName, p.PersonalId, p.RelatedPersons, p.RelatedToPersons })
-                .Select(g => new GetRelatedPersonsResponseModel
+            var items = persons
+                .GroupBy(p => new
                 {
-                    Id = g.Key.Id,
-                    FirstName = g.Key.FirstName,
-                    LastName = g.Key.LastName,
-                    PersonalId = g.Key.PersonalId,
-
-                    RelatedPersons = g.Key.RelatedPersons.Select(p => new RelatedPersonRecord(
-                        p.RelatedPerson.FirstName,
-                        p.RelatedPerson.LastName,
-                        p.RelatedPerson.PersonalId,
-                        $"{p.RelatedPerson.BirthDate:dd-MM-yyyy}",
-                        null,
-                        $"{p.RelatedPerson.Gender}",
-                        $"{p.RelatedType}")),
-
-                    RelatedToPersons = g.Key.RelatedToPersons.Select(p => new RelatedPersonRecord(
-                        p.Person.FirstName,
-                        p.Person.LastName,
-                        p.Person.PersonalId,
-                        $"{p.Person.BirthDate:dd-MM-yyyy}",
-                        null,
-                        $"{p.Person.Gender}",
-                        $"{p.RelatedType}")),
-
-                    RelatedTypeCounts = g.SelectMany(x => x.RelatedPersons)
+                    p.Id,
+                    p.FirstName,
+                    p.LastName,
+                    p.PersonalId,
+                    p.RelatedPersons,
+                    p.RelatedToPersons
+                })
+                .Select(g =>
+                {
+                    var key = g.Key;
+                    return new GetRelatedPersonsResponseModel
+                    {
+                        Id = key.Id,
+                        FirstName = key.FirstName,
+                        LastName = key.LastName,
+                        PersonalId = key.PersonalId,
+                        RelatedPersons = key.RelatedPersons.Select(p => new RelatedPersonRecord(
+                            p.RelatedPerson.FirstName,
+                            p.RelatedPerson.LastName,
+                            p.RelatedPerson.PersonalId,
+                            $"{p.RelatedPerson.BirthDate:dd-MM-yyyy}",
+                            null,
+                            $"{p.RelatedPerson.Gender}",
+                            $"{p.RelatedType}")),
+                        RelatedToPersons = key.RelatedToPersons.Select(p => new RelatedPersonRecord(
+                            p.Person.FirstName,
+                            p.Person.LastName,
+                            p.Person.PersonalId,
+                            $"{p.Person.BirthDate:dd-MM-yyyy}",
+                            null,
+                            $"{p.Person.Gender}",
+                            $"{p.RelatedType}")),
+                        RelatedTypeCounts = g.SelectMany(x => x.RelatedPersons)
                             .GroupBy(rp => rp.RelatedType)
                             .Select(gr => new RelatedTypeCount
                             {
@@ -62,6 +69,7 @@ namespace Persons.Directory.Application.ReportManagement.Queries
                                 Count = gr.Count()
                             })
                             .ToList()
+                    };
                 });
 
             return new GetRelatedPersonsResponse

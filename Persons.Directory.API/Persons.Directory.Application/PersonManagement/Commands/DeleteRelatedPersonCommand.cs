@@ -19,13 +19,13 @@ public class DeleteRelatedPersonCommandHandler : IRequestHandler<DeleteRelatedPe
         var person = await _repository.GetAsync(request.PersonId);
         if (person is null)
         {
-            throw new HttpException($"Delete related person failed", HttpStatusCode.NotFound);
+            throw new BadRequestException($"Delete related person failed", HttpStatusCode.NotFound);
         }
 
         var relatedPerson = person.RelatedPersons.FirstOrDefault(x => x.RelatedPersonId == request.RelatedPersonId);
         if (relatedPerson is null)
         {
-            throw new HttpException($"Related person not found by Id: {request.RelatedPersonId}", HttpStatusCode.NotFound);
+            throw new BadRequestException($"Related person not found by Id: {request.RelatedPersonId}", HttpStatusCode.NotFound);
         }
 
         person.RelatedPersons.Remove(relatedPerson);

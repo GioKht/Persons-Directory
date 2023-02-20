@@ -20,13 +20,13 @@ public class CreatePersonRelationshipCommandHandler : IRequestHandler<CreatePers
         var person = await _repository.GetAsync(request.PersonId);
         if (person is null)
         {
-            throw new HttpException($"Person not found by Id: {request.PersonId}", HttpStatusCode.NotFound);
+            throw new BadRequestException($"Person not found by Id: {request.PersonId}", HttpStatusCode.NotFound);
         }
 
         var relatedPerson = await _repository.GetAsync(request.RelatedPersonId);
         if (relatedPerson is null)
         {
-            throw new HttpException($"RelatedPerson not found by Id: {request.RelatedPersonId}", HttpStatusCode.NotFound);
+            throw new BadRequestException($"RelatedPerson not found by Id: {request.RelatedPersonId}", HttpStatusCode.NotFound);
         }
 
         var personRelation = new PersonRelation(person, relatedPerson, request.RelatedType);

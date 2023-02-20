@@ -20,12 +20,12 @@ public class UploadPersonImageCommand : IRequestHandler<UploadPersonImageRequest
 
         if (person is null)
         {
-            throw new HttpException($"Unable to upload image, person not found by Id: {request.Id}", HttpStatusCode.NotFound);
+            throw new BadRequestException($"Unable to upload image, person not found by Id: {request.Id}", HttpStatusCode.NotFound);
         }
 
         if (request.File == null || request.File.Length == 0)
         {
-            throw new HttpException("No file is selected", HttpStatusCode.BadRequest);
+            throw new BadRequestException("No file is selected", HttpStatusCode.BadRequest);
         }
 
         var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
@@ -39,6 +39,12 @@ public class UploadPersonImageCommand : IRequestHandler<UploadPersonImageRequest
         if (request.File.Length > maxFileSizeInBytes)
         {
             throw new ArgumentException("File size is too large. Maximum file size is 2MB.");
+        }
+
+        string imagePath = @"wwwroot\images";
+        if (!System.IO.Directory.Exists(imagePath))
+        {
+            System.IO.Directory.CreateDirectory(imagePath);
         }
 
         string fileName = $"{person.FirstName}_{person.LastName}_{person.Id}.jpg";

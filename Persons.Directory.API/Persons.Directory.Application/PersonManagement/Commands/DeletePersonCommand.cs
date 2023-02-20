@@ -21,7 +21,7 @@ public class DeletePersonCommandHandler : IRequestHandler<DeletePersonRequest, U
 
         if (person is null)
         {
-            throw new HttpException($"Person not found by Id: {request.Id}", HttpStatusCode.NotFound);
+            throw new BadRequestException($"Person not found by Id: {request.Id}", HttpStatusCode.NotFound);
         }
 
         _repository.Delete(person);

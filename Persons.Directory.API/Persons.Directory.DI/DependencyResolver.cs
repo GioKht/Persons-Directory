@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Persons.Directory.Application;
+using Persons.Directory.Application.Infrastructure;
 using Persons.Directory.DI.StartupExtensions;
 using Persons.Directory.Persistence.Db;
 
@@ -16,6 +17,7 @@ public class DependencyResolver
 
         builder.Services
             .AddMediatR(typeof(ApplicationProgram))
+            .AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>))
             .AddFluentValidation()
             .AddApplicationServices()
             .AddApplicationDbContext(connectionString)

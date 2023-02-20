@@ -1,4 +1,5 @@
-﻿using Persons.Directory.Application.Enums;
+﻿using FluentValidation;
+using Persons.Directory.Application.Enums;
 
 namespace Persons.Directory.Application.PersonManagement.Models;
 

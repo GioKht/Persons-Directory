@@ -1,8 +1,12 @@
+using Persons.Directory.API.Configurations;
+using Persons.Directory.Application.Infrastructure;
 using Persons.Directory.DI;
 using Persons.Directory.Persistence.Initializer;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
+
+Logger.Configure(builder);
 
 DependencyResolver.Resolve(builder);
 
@@ -19,6 +23,8 @@ var app = builder.Build();
 
 var dbInitializer = new DbInitializer();
 await dbInitializer.Seed(app.Services);
+
+app.UseErrorHandlingMiddleware();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
