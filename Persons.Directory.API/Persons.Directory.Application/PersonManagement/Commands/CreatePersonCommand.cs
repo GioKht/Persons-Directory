@@ -6,6 +6,7 @@ using Persons.Directory.Application.Exceptions;
 using Persons.Directory.Application.Infrastructure;
 using Persons.Directory.Application.Interfaces;
 using Persons.Directory.Application.PersonManagement.Models;
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 
 namespace Persons.Directory.Application.PersonManagement.Commands;
@@ -43,16 +44,22 @@ public class CreatePersonRequest : ICommand<Unit>
 
     }
 
+    [Required]
     public string FirstName { get; set; }
 
+    [Required]
     public string LastName { get; set; }
 
+    [Required]
     public string PersonalId { get; set; }
 
+    [Required]
     public DateTime BirthDate { get; set; }
 
+    [Required]
     public int CityId { get; set; }
 
+    [Required]
     public Gender Gender { get; set; }
 
     public IEnumerable<PhoneNumberModel> PhoneNumbers { get; set; }
@@ -65,7 +72,6 @@ public class CreatePersonRequestValidation : AbstractValidator<CreatePersonReque
     public CreatePersonRequestValidation()
     {
         RuleFor(x => x.FirstName)
-           .Cascade(CascadeMode.Stop)
            .NotNull().WithMessage("First name is required.")
            .NotEmpty().WithMessage("First name is required.")
            .Length(2, 50).WithMessage("First name length should be between 2 and 50 characters.")
@@ -73,7 +79,6 @@ public class CreatePersonRequestValidation : AbstractValidator<CreatePersonReque
            .WithMessage("First name should not contain both English and Georgian alphabets.");
 
         RuleFor(x => x.LastName)
-           .Cascade(CascadeMode.Stop)
            .NotNull().WithMessage("LastName name is required.")
            .NotEmpty().WithMessage("LastName name is required.")
            .Length(2, 50).WithMessage("LastName name length should be between 2 and 50 characters.")
@@ -90,7 +95,7 @@ public class CreatePersonRequestValidation : AbstractValidator<CreatePersonReque
 
         RuleFor(x => x.BirthDate)
             .NotEmpty().WithMessage("Birth date is required.")
-            .Must(birthDate => birthDate <= DateTime.Now.AddYears(-18))
+            .LessThan(DateTime.Now.AddYears(-18))
                 .WithMessage("Person must be at least 18 years old to register.");
 
         RuleFor(x => x.PhoneNumbers)

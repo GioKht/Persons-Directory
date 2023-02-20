@@ -41,10 +41,10 @@ public class UploadPersonImageCommand : IRequestHandler<UploadPersonImageRequest
             throw new ArgumentException("File size is too large. Maximum file size is 2MB.");
         }
 
-        string imagePath = @"wwwroot\images";
-        if (!System.IO.Directory.Exists(imagePath))
+        var filePath = Path.Combine(System.IO.Directory.GetCurrentDirectory(), @"wwwroot\images");
+        if (!System.IO.Directory.Exists(filePath))
         {
-            System.IO.Directory.CreateDirectory(imagePath);
+            System.IO.Directory.CreateDirectory(filePath);
         }
 
         string fileName = $"{person.FirstName}_{person.LastName}_{person.Id}.jpg";

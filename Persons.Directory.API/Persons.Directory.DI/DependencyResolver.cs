@@ -17,7 +17,7 @@ public class DependencyResolver
 
         builder.Services
             .AddMediatR(typeof(ApplicationProgram))
-            .AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>))
+            .AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>))
             .AddFluentValidation()
             .AddApplicationServices()
             .AddApplicationDbContext(connectionString)

@@ -8,7 +8,7 @@ using System.Linq.Expressions;
 namespace Persons.Directory.Application.Infrastructure
 {
     public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-        where TRequest : IRequest<TResponse>, new()
+        where TRequest : IRequest<TResponse>
     {
         public ValidationBehavior()
         {

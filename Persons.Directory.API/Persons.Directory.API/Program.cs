@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Persons.Directory.API.Configurations;
 using Persons.Directory.Application.Infrastructure;
 using Persons.Directory.DI;
@@ -6,14 +7,23 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-Logger.Configure(builder);
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;
+});
 
-DependencyResolver.Resolve(builder);
+builder.Services.AddScoped<ValidationActionFilter>();
 
-builder.Services.AddControllers().AddJsonOptions(options =>
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add(typeof(ValidationActionFilter));
+}).AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
+
+Logger.Configure(builder);
+DependencyResolver.Resolve(builder);
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
