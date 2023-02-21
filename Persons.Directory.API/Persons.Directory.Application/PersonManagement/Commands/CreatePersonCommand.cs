@@ -131,10 +131,6 @@ public class CreatePersonRequestValidation : AbstractValidator<CreatePersonReque
                 break;
         }
 
-        var s1 = Assembly.GetExecutingAssembly().GetManifestResourceNames();
-
-
-        var s = Assembly.GetExecutingAssembly().FullName;
         var resourceManager = new ResourceManager(resourceFileName, Assembly.GetExecutingAssembly());
         return resourceManager.GetString(key);
     }
