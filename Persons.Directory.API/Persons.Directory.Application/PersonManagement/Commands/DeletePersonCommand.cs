@@ -1,8 +1,10 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Persons.Directory.Application.Constants;
 using Persons.Directory.Application.Domain;
 using Persons.Directory.Application.Exceptions;
 using Persons.Directory.Application.Interfaces;
+using Persons.Directory.Application.Services;
 using System.Net;
 
 namespace Persons.Directory.Application.PersonManagement.Commands;
@@ -11,9 +13,11 @@ public class DeletePersonCommandHandler : IRequestHandler<DeletePersonRequest, U
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IRepository<Person> _repository;
+    private readonly IResourceManagerService _resourceManagerService;
 
-    public DeletePersonCommandHandler(IUnitOfWork unitOfWork)
-        => (_unitOfWork, _repository) = (unitOfWork, unitOfWork.GetRepository<Person>());
+    public DeletePersonCommandHandler(IUnitOfWork unitOfWork, IResourceManagerService resourceManagerService)
+        => (_unitOfWork, _repository, _resourceManagerService)
+        = (unitOfWork, unitOfWork.GetRepository<Person>(), resourceManagerService);
 
     public async Task<Unit> Handle(DeletePersonRequest request, CancellationToken cancellationToken)
     {
@@ -21,7 +25,8 @@ public class DeletePersonCommandHandler : IRequestHandler<DeletePersonRequest, U
 
         if (person is null)
         {
-            throw new BadRequestException($"Person not found by Id: {request.Id}", HttpStatusCode.NotFound);
+            var message = _resourceManagerService.GetString(ValidationMessages.PersonNotFoundById);
+            throw new NotFoundException(string.Format(message, request.Id), true);
         }
 
         _repository.Delete(person);

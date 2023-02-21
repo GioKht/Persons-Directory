@@ -1,13 +1,13 @@
 ﻿using Application.Infrastructure;
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using Persons.Directory.Application.Constants;
 using Persons.Directory.Application.Domain;
 using Persons.Directory.Application.Exceptions;
 using Persons.Directory.Application.Interfaces;
 using Persons.Directory.Application.PersonManagement.Models;
-using Persons.Directory.Application.PersonManagement.Records;
+using Persons.Directory.Application.Services;
 using Persons.Directory.Application.Shared.Records;
-using System.Net;
 
 namespace Persons.Directory.Application.PersonManagement.Queries;
 
@@ -15,10 +15,11 @@ public class GetPersonDetailsQueryHandler : IRequestHandler<GetPersonDetailsRequ
 {
     private readonly IRepository<Person> _repository;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IResourceManagerService _resourceManagerService;
 
-    public GetPersonDetailsQueryHandler(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor)
-        => (_repository, _httpContextAccessor)
-        = (unitOfWork.GetRepository<Person>(), httpContextAccessor);
+    public GetPersonDetailsQueryHandler(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor, IResourceManagerService resourceManagerService)
+        => (_repository, _httpContextAccessor, _resourceManagerService)
+        = (unitOfWork.GetRepository<Person>(), httpContextAccessor, resourceManagerService);
 
     public async Task<GetPersonDetailsResponse> Handle(GetPersonDetailsRequest request, CancellationToken cancellationToken)
     {
@@ -26,7 +27,8 @@ public class GetPersonDetailsQueryHandler : IRequestHandler<GetPersonDetailsRequ
 
         if (person is null)
         {
-            throw new BadRequestException($"Person not found by Id: {request.Id}", HttpStatusCode.NotFound);
+            var message = _resourceManagerService.GetString(ValidationMessages.PersonNotFoundById);
+            throw new NotFoundException(string.Format(message, request.Id), true);
         }
 
         return new GetPersonDetailsResponse

@@ -1,12 +1,9 @@
-using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Persons.Directory.API.Configurations;
 using Persons.Directory.API.SwaggerSupport;
 using Persons.Directory.Application.Middlewares;
 using Persons.Directory.DI;
 using Persons.Directory.Persistence.Initializer;
-using System.Globalization;
-using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 

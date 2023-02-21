@@ -54,6 +54,20 @@ namespace Persons.Directory.Application.Middlewares
                             fillDefaultResponse = false;
                         }
                     }
+                    else if (exception is NotFoundException)
+                    {
+                        var notFoundException = exception as NotFoundException;
+
+                        code = (int)HttpStatusCode.NotFound;
+
+                        if (notFoundException.ShowMessage)
+                        {
+                            response.Message = exception.Message;
+                            response.ErrorCode = code.ToString();
+
+                            fillDefaultResponse = false;
+                        }
+                    }
                     else if (exception is UnprocessableEntityException)
                     {
                         var unprocessableEntityException = exception as UnprocessableEntityException;

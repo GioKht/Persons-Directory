@@ -1,19 +1,14 @@
 ﻿using FluentValidation;
 using MediatR;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Localization;
+using Persons.Directory.Application.Constants;
 using Persons.Directory.Application.Domain;
 using Persons.Directory.Application.Enums;
 using Persons.Directory.Application.Exceptions;
 using Persons.Directory.Application.Infrastructure;
 using Persons.Directory.Application.Interfaces;
 using Persons.Directory.Application.PersonManagement.Models;
-using Persons.Directory.Application.Resources.GE;
-using System.ComponentModel.DataAnnotations;
-using System.Globalization;
+using Persons.Directory.Application.Services;
 using System.Net;
-using System.Reflection;
-using System.Resources;
 
 namespace Persons.Directory.Application.PersonManagement.Commands;
 
@@ -22,7 +17,7 @@ public class CreatePersonCommandHandler : IRequestHandler<CreatePersonRequest, U
     private readonly IUnitOfWork _unitOfWork;
     private readonly IRepository<Person> _repository;
 
-    public CreatePersonCommandHandler(IUnitOfWork unitOfWork)
+    public CreatePersonCommandHandler(IUnitOfWork unitOfWork, IResourceManagerService resourceManagerService)
         => (_unitOfWork, _repository) = (unitOfWork, unitOfWork.GetRepository<Person>());
 
     public async Task<Unit> Handle(CreatePersonRequest request, CancellationToken cancellationToken)
@@ -68,70 +63,66 @@ public class CreatePersonRequestValidation : AbstractValidator<CreatePersonReque
 {
     private readonly string LatinOrGeorgianAlphabetsRegex = @"^((?=[\p{IsBasicLatin}\s]*$|[\p{IsGeorgian}\s]*$)[\p{L}\s]*)$";
 
-    public CreatePersonRequestValidation()
-    {
-        var cultureName = CultureInfo.CurrentCulture.Name;
+    private readonly IResourceManagerService _resourceManagerService;
 
-        //var errorMessage = GetErrorMessage(cultureName, "FirstNameRequired");
+    public CreatePersonRequestValidation(IResourceManagerService resourceManagerService)
+    {
+        _resourceManagerService = resourceManagerService;
 
         RuleFor(x => x.FirstName)
-           .NotNull().WithMessage(SharedResource.FirstNameRequired)
-           .NotEmpty().WithMessage(SharedResource.FirstNameRequired)
-           .Length(2, 50).WithMessage("First name length should be between 2 and 50 characters.")
+           .NotNull()
+           .WithMessage(GetResourceString(ValidationMessages.FirstNameRequired))
+           .NotEmpty()
+           .WithMessage(GetResourceString(ValidationMessages.FirstNameRequired))
+           .Length(2, 50)
+           .WithMessage(GetResourceString(ValidationMessages.FirstNameInvalidLength))
            .Matches(LatinOrGeorgianAlphabetsRegex)
-           .WithMessage("First name should not contain both English and Georgian alphabets.");
+           .WithMessage(GetResourceString(ValidationMessages.FirstNameInvalidAlphabets));
 
         RuleFor(x => x.LastName)
-           .NotNull().WithMessage("LastName name is required.")
-           .NotEmpty().WithMessage("LastName name is required.")
-           .Length(2, 50).WithMessage("LastName name length should be between 2 and 50 characters.")
+           .NotNull()
+           .WithMessage(GetResourceString(ValidationMessages.LastNameRequired))
+           .NotEmpty()
+           .WithMessage(GetResourceString(ValidationMessages.LastNameRequired))
+           .Length(2, 50)
+           .WithMessage(GetResourceString(ValidationMessages.LastNameInvalidLength))
            .Matches(LatinOrGeorgianAlphabetsRegex)
-           .WithMessage("LastName name should not contain both English and Georgian alphabets.");
+           .WithMessage(GetResourceString(ValidationMessages.LastNameInvalidAlphabets));
 
         RuleFor(x => x.Gender)
             .Must(x => Enum.TryParse<Gender>(x.ToString(), out _))
-            .WithMessage("Gender should be either Male or Female.");
+            .WithMessage(GetResourceString(ValidationMessages.GenderInvalidValue));
 
         RuleFor(x => x.PersonalId)
             .Matches(@"^\d{11}$")
-            .WithMessage("PersonalId must contain exactly 11 numeric characters.");
+            .WithMessage(GetResourceString(ValidationMessages.PersonalIdMustContainExactly11NumericCharacters));
 
         RuleFor(x => x.BirthDate)
-            .NotEmpty().WithMessage("Birth date is required.")
             .LessThan(DateTime.Now.AddYears(-18))
-                .WithMessage("Person must be at least 18 years old to register.");
+            .WithMessage(GetResourceString(ValidationMessages.PersonMustBeAtLeast18YearsOldToRegister));
 
         RuleFor(x => x.PhoneNumbers)
-            .NotNull().WithMessage("Phone numbers cannot be null")
-            .Must(x => x.Any()).WithMessage("At least one phone number must be provided");
+            .NotNull()
+            .WithMessage("Phone numbers cannot be null")
+            .Must(x => x.Any())
+            .WithMessage(GetResourceString(ValidationMessages.AtLeastOnePhoneNumberMustBeProvided));
 
         RuleForEach(x => x.PhoneNumbers)
             .ChildRules(phoneNumber =>
             {
                 phoneNumber.RuleFor(x => x.Number)
-                    .Length(4, 50).WithMessage("Number length should be between 4 and 50 characters.");
+                    .Length(4, 50)
+                    .WithMessage(GetResourceString(ValidationMessages.NumberInvalidLength));
 
                 phoneNumber.RuleFor(x => x.NumberType)
                     .Must(x => Enum.TryParse<PhoneNumberType>(x.ToString(), out _))
-                    .WithMessage("NumberType should be either Mobile, Office or Home.");
+                    .WithMessage(GetResourceString(ValidationMessages.NumberInvalidType));
             });
     }
 
-    private string GetErrorMessage(string cultureName, string key)
+    private string GetResourceString(string key)
     {
-        string resourceFileName;
-        switch (cultureName)
-        {
-            case "ka-GE":
-                resourceFileName = "Persons.Directory.Application/Resources/SharedResourceGE.resx";
-                break;
-            case "en-US":
-            default:
-                resourceFileName = "Persons.Directory.Application/Resources/SharedResourceEN.resx";
-                break;
-        }
-
-        var resourceManager = new ResourceManager(resourceFileName, Assembly.GetExecutingAssembly());
-        return resourceManager.GetString(key);
+        return _resourceManagerService.GetString(key);
     }
+
 }

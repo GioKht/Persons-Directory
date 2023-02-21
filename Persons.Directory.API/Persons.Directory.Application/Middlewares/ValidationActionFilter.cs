@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using System.Globalization;
 
 namespace Persons.Directory.Application.Middlewares
 {
@@ -11,17 +10,16 @@ namespace Persons.Directory.Application.Middlewares
         {
             if (!context.ModelState.IsValid)
             {
-                var errors = context.ModelState.Values
-                    .SelectMany(v => v.Errors)
-                    .Select(e => e.ErrorMessage)
-                    .ToList();
+                var errors = context.ModelState.ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToList()
+                );
 
-                var culture = CultureInfo.CurrentUICulture;
-
-                var response = new BadRequestResponse(string.Join(", ", errors));
+                var response = new BadRequestResponse("One or more validation errors occurred.");
 
                 context.Result = new BadRequestObjectResult(new
                 {
+                    Errors = errors,
                     Error = response.Message
                 });
 

@@ -1,11 +1,13 @@
 ﻿using FluentValidation;
 using MediatR;
+using Persons.Directory.Application.Constants;
 using Persons.Directory.Application.Domain;
 using Persons.Directory.Application.Enums;
 using Persons.Directory.Application.Exceptions;
 using Persons.Directory.Application.Infrastructure;
 using Persons.Directory.Application.Interfaces;
 using Persons.Directory.Application.PersonManagement.Models;
+using Persons.Directory.Application.Services;
 using System.Net;
 using System.Text.Json.Serialization;
 
@@ -14,23 +16,26 @@ namespace Persons.Directory.Application.PersonManagement.Commands;
 public class UpdatePersonCommandHandler : IRequestHandler<UpdatePersonRequest, Unit>
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IRepository<Person> _repostiory;
+    private readonly IRepository<Person> _repository;
+    private readonly IResourceManagerService _resourceManagerService;
 
-    public UpdatePersonCommandHandler(IUnitOfWork unitOfWork)
-        => (_unitOfWork, _repostiory) = (unitOfWork, unitOfWork.GetRepository<Person>());
+    public UpdatePersonCommandHandler(IUnitOfWork unitOfWork, IResourceManagerService resourceManagerService)
+        => (_unitOfWork, _repository, _resourceManagerService)
+        = (unitOfWork, unitOfWork.GetRepository<Person>(), resourceManagerService);
 
     public async Task<Unit> Handle(UpdatePersonRequest request, CancellationToken cancellationToken)
     {
-        var person = await _repostiory.GetAsync(request.Id);
+        var person = await _repository.GetAsync(request.Id);
 
         if (person is null)
         {
-            throw new BadRequestException($"Person not found by Id: {request.Id}", HttpStatusCode.NotFound);
+            var message = _resourceManagerService.GetString(ValidationMessages.PersonNotFoundById);
+            throw new NotFoundException(string.Format(message, request.Id), true);
         }
 
         person.SetValuesToUpdate(request);
 
-        await _repostiory.UpdateAsync(person);
+        await _repository.UpdateAsync(person);
         await _unitOfWork.CommitAsync();
 
         return new Unit();
@@ -55,35 +60,53 @@ public class UpdatePersonRequestValidation : AbstractValidator<UpdatePersonReque
 {
     private readonly string LatinOrGeorgianAlphabetsRegex = @"^((?=[\p{IsBasicLatin}\s]*$|[\p{IsGeorgian}\s]*$)[\p{L}\s]*)$";
 
-    public UpdatePersonRequestValidation()
+    private readonly IResourceManagerService _resourceManagerService;
+
+    public UpdatePersonRequestValidation(IResourceManagerService resourceManagerService)
     {
+        _resourceManagerService = resourceManagerService;
+
         RuleFor(x => x.FirstName)
-           .NotNull().WithMessage("First name is required.")
-           .NotEmpty().WithMessage("First name is required.")
-           .Length(2, 50).WithMessage("First name length should be between 2 and 50 characters.")
+           .NotNull()
+           .WithMessage(GetResourceString(ValidationMessages.FirstNameRequired))
+           .NotEmpty()
+           .WithMessage(GetResourceString(ValidationMessages.FirstNameRequired))
+           .Length(2, 50)
+           .WithMessage(GetResourceString(ValidationMessages.FirstNameInvalidLength))
            .Matches(LatinOrGeorgianAlphabetsRegex)
-           .WithMessage("First name should not contain both English and Georgian alphabets.");
+           .WithMessage(GetResourceString(ValidationMessages.FirstNameInvalidAlphabets));
 
         RuleFor(x => x.LastName)
-           .NotNull().WithMessage("LastName name is required.")
-           .NotEmpty().WithMessage("LastName name is required.")
-           .Length(2, 50).WithMessage("LastName name length should be between 2 and 50 characters.")
+           .NotNull()
+           .WithMessage(GetResourceString(ValidationMessages.LastNameRequired))
+           .NotEmpty()
+           .WithMessage(GetResourceString(ValidationMessages.LastNameRequired))
+           .Length(2, 50)
+           .WithMessage(GetResourceString(ValidationMessages.LastNameInvalidLength))
            .Matches(LatinOrGeorgianAlphabetsRegex)
-           .WithMessage("LastName name should not contain both English and Georgian alphabets.");
+           .WithMessage(GetResourceString(ValidationMessages.LastNameInvalidAlphabets));
 
         RuleFor(x => x.PhoneNumbers)
-            .NotNull().WithMessage("Phone numbers cannot be null")
-            .Must(x => x.Any()).WithMessage("At least one phone number must be provided");
+            .NotNull()
+            .WithMessage("Phone numbers cannot be null")
+            .Must(x => x.Any())
+            .WithMessage(GetResourceString(ValidationMessages.AtLeastOnePhoneNumberMustBeProvided));
 
         RuleForEach(x => x.PhoneNumbers)
             .ChildRules(phoneNumber =>
             {
                 phoneNumber.RuleFor(x => x.Number)
-                    .Length(4, 50).WithMessage("Number length should be between 4 and 50 characters.");
+                    .Length(4, 50)
+                    .WithMessage(GetResourceString(ValidationMessages.NumberInvalidLength));
 
                 phoneNumber.RuleFor(x => x.NumberType)
                     .Must(x => Enum.TryParse<PhoneNumberType>(x.ToString(), out _))
-                    .WithMessage("NumberType should be either Mobile, Office or Home.");
+                    .WithMessage(GetResourceString(ValidationMessages.NumberInvalidType));
             });
+    }
+
+    private string GetResourceString(string key)
+    {
+        return _resourceManagerService.GetString(key);
     }
 }

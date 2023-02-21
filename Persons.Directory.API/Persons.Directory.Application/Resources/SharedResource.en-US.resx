@@ -147,7 +147,7 @@
   <data name="LastNameInvalidAlphabets" xml:space="preserve">
     <value>Last name should not contain both English and Georgian alphabets.</value>
   </data>
-  <data name="LastNameInvalidLenght" xml:space="preserve">
+  <data name="LastNameInvalidLength" xml:space="preserve">
     <value>Last name length should be between 2 and 50 characters.</value>
   </data>
   <data name="LastNameRequired" xml:space="preserve">
@@ -156,7 +156,7 @@
   <data name="NoFileIsSelected" xml:space="preserve">
     <value>No file is selected</value>
   </data>
-  <data name="NumberInvalidLenth" xml:space="preserve">
+  <data name="NumberInvalidLength" xml:space="preserve">
     <value>Number length should be between 4 and 50 characters.</value>
   </data>
   <data name="NumberInvalidType" xml:space="preserve">
@@ -165,7 +165,7 @@
   <data name="PersonalIdMustContainExactly11NumericCharacters" xml:space="preserve">
     <value>PersonalId must contain exactly 11 numeric characters.</value>
   </data>
-  <data name="PersonMustBeAtLeast18YearsOldToRegister." xml:space="preserve">
+  <data name="PersonMustBeAtLeast18YearsOldToRegister" xml:space="preserve">
     <value>Person must be at least 18 years old to register.</value>
   </data>
   <data name="PersonNotFoundById" xml:space="preserve">

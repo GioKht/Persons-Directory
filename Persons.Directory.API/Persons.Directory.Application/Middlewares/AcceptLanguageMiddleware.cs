@@ -21,17 +21,25 @@ public class AcceptLanguageMiddleware
         var defaultCulture = options.Value.DefaultRequestCulture.Culture;
         var userLanguages = context.Request.Headers["Accept-Language"].ToString().Split(',');
 
-        var culture = CultureInfo.DefaultThreadCurrentCulture;
+        CultureInfo culture = defaultCulture;
+
         if (userLanguages.Length > 0)
         {
-            var cultureName = userLanguages
-                .Select(x => CultureInfo.GetCultureInfo(x.Trim()))
-                .Where(x => supportedCultures.Contains(x))
-                .FirstOrDefault()?.Name;
-
-            if (!string.IsNullOrEmpty(cultureName))
+            foreach (var userLanguage in userLanguages)
             {
-                culture = new CultureInfo(cultureName);
+                try
+                {
+                    var cultureInfo = CultureInfo.GetCultureInfo(userLanguage.Trim());
+                    if (supportedCultures.Contains(cultureInfo))
+                    {
+                        culture = cultureInfo;
+                        break;
+                    }
+                }
+                catch (CultureNotFoundException)
+                {
+                    // Ignore invalid culture names
+                }
             }
         }
 
@@ -40,4 +48,5 @@ public class AcceptLanguageMiddleware
 
         await _next(context);
     }
+
 }

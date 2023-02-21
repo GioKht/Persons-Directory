@@ -1,8 +1,10 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Http;
+using Persons.Directory.Application.Constants;
 using Persons.Directory.Application.Domain;
 using Persons.Directory.Application.Exceptions;
 using Persons.Directory.Application.Interfaces;
+using Persons.Directory.Application.Services;
 using System.Net;
 using System.Text.Json.Serialization;
 
@@ -11,8 +13,11 @@ namespace Persons.Directory.Application.PersonManagement.Commands;
 public class UploadPersonImageCommand : IRequestHandler<UploadPersonImageRequest, Unit>
 {
     private readonly IRepository<Person> _repository;
+    private readonly IResourceManagerService _resourceManagerService;
 
-    public UploadPersonImageCommand(IUnitOfWork unitOfWork) => _repository = unitOfWork.GetRepository<Person>();
+    public UploadPersonImageCommand(IUnitOfWork unitOfWork, IResourceManagerService resourceManagerService)
+        => (_repository, _resourceManagerService)
+        = (unitOfWork.GetRepository<Person>(), resourceManagerService);
 
     public async Task<Unit> Handle(UploadPersonImageRequest request, CancellationToken cancellationToken)
     {
@@ -25,20 +30,21 @@ public class UploadPersonImageCommand : IRequestHandler<UploadPersonImageRequest
 
         if (request.File == null || request.File.Length == 0)
         {
-            throw new BadRequestException("No file is selected", HttpStatusCode.BadRequest);
+            var message = _resourceManagerService.GetString(ValidationMessages.NoFileIsSelected);
+            throw new BadRequestException(message, HttpStatusCode.BadRequest);
         }
 
         var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
         var extension = Path.GetExtension(request.File.FileName);
         if (!allowedExtensions.Contains(extension.ToLower()))
         {
-            throw new ArgumentException("Invalid file type. Only JPG and PNG files are allowed.");
+            throw new ArgumentException(_resourceManagerService.GetString(ValidationMessages.InvalidFileType));
         }
 
         var maxFileSizeInBytes = 2097152;
         if (request.File.Length > maxFileSizeInBytes)
         {
-            throw new ArgumentException("File size is too large. Maximum file size is 2MB.");
+            throw new ArgumentException(_resourceManagerService.GetString(ValidationMessages.FileSizeIsTooLarge));
         }
 
         var filePath = Path.Combine(System.IO.Directory.GetCurrentDirectory(), @"wwwroot\images");
