@@ -58,7 +58,6 @@ public class UpdatePersonRequestValidation : AbstractValidator<UpdatePersonReque
     public UpdatePersonRequestValidation()
     {
         RuleFor(x => x.FirstName)
-           .Cascade(CascadeMode.Stop)
            .NotNull().WithMessage("First name is required.")
            .NotEmpty().WithMessage("First name is required.")
            .Length(2, 50).WithMessage("First name length should be between 2 and 50 characters.")
@@ -66,7 +65,6 @@ public class UpdatePersonRequestValidation : AbstractValidator<UpdatePersonReque
            .WithMessage("First name should not contain both English and Georgian alphabets.");
 
         RuleFor(x => x.LastName)
-           .Cascade(CascadeMode.Stop)
            .NotNull().WithMessage("LastName name is required.")
            .NotEmpty().WithMessage("LastName name is required.")
            .Length(2, 50).WithMessage("LastName name length should be between 2 and 50 characters.")

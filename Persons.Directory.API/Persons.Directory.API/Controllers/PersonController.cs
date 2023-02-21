@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Persons.Directory.Application.Infrastructure.Models;
 using Persons.Directory.Application.PersonManagement.Commands;
 using Persons.Directory.Application.PersonManagement.Queries;
 using System.ComponentModel.DataAnnotations;
@@ -25,22 +26,26 @@ namespace Persons.Directory.API.Controllers
         [Route("{id}")]
         [HttpGet]
         [ProducesResponseType(typeof(List<GetPersonDetailsResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(FailedRequestResponse), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Details([Required] int id)
             => Ok(await _mediator.Send(new GetPersonDetailsRequest { Id = id }));
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(FailedRequestResponse), StatusCodes.Status208AlreadyReported)]
         public async Task<IActionResult> Create([FromBody] CreatePersonRequest request)
             => Ok(await _mediator.Send(request));
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(FailedRequestResponse), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> CreateRelationship([FromBody] CreatePersonRelationshipRequest request)
             => Ok(await _mediator.Send(request));
 
         [Route("{id}")]
         [HttpPatch]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(FailedRequestResponse), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update([Required] int id, [FromBody] UpdatePersonRequest request)
         {
             request.Id = id;
@@ -50,6 +55,8 @@ namespace Persons.Directory.API.Controllers
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(FailedRequestResponse), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(FailedRequestResponse), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> UploadImage([Required] int id, [Required] IFormFile file)
             => Ok(await _mediator.Send(new UploadPersonImageRequest
             {
@@ -60,6 +67,7 @@ namespace Persons.Directory.API.Controllers
         [Route("{id}")]
         [HttpDelete]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(FailedRequestResponse), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Delete([Required] int id)
             => Ok(await _mediator.Send(new DeletePersonRequest
             {
@@ -69,6 +77,7 @@ namespace Persons.Directory.API.Controllers
         [Route("{personId}/{relatedPersonId}")]
         [HttpDelete]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(FailedRequestResponse), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteRelatedPerson([Required] int personId, [Required] int relatedPersonId)
            => Ok(await _mediator.Send(new DeleteRelatedPersonRequest
            {

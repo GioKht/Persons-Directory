@@ -5,7 +5,7 @@ using Persons.Directory.Application.Exceptions;
 using Serilog;
 using System.Linq.Expressions;
 
-namespace Persons.Directory.Application.Infrastructure
+namespace Persons.Directory.Application.Middlewares
 {
     public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
         where TRequest : IRequest<TResponse>

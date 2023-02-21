@@ -1,13 +1,9 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Globalization;
 
-namespace Persons.Directory.Application.Infrastructure
+namespace Persons.Directory.Application.Middlewares
 {
     public class ValidationActionFilter : IAsyncActionFilter
     {
@@ -20,12 +16,15 @@ namespace Persons.Directory.Application.Infrastructure
                     .Select(e => e.ErrorMessage)
                     .ToList();
 
+                var culture = CultureInfo.CurrentUICulture;
+
                 var response = new BadRequestResponse(string.Join(", ", errors));
 
                 context.Result = new BadRequestObjectResult(new
                 {
                     Error = response.Message
                 });
+
                 return;
             }
 

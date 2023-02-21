@@ -7,7 +7,7 @@ using Persons.Directory.Application.Infrastructure.Models;
 using Serilog;
 using System.Net;
 
-namespace Persons.Directory.Application.Infrastructure
+namespace Persons.Directory.Application.Middlewares
 {
     public static class ErrorHandlingMiddlewareExtensions
     {

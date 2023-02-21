@@ -1,13 +1,19 @@
 ﻿using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Localization;
 using Persons.Directory.Application.Domain;
 using Persons.Directory.Application.Enums;
 using Persons.Directory.Application.Exceptions;
 using Persons.Directory.Application.Infrastructure;
 using Persons.Directory.Application.Interfaces;
 using Persons.Directory.Application.PersonManagement.Models;
+using Persons.Directory.Application.Resources.GE;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Net;
+using System.Reflection;
+using System.Resources;
 
 namespace Persons.Directory.Application.PersonManagement.Commands;
 
@@ -22,7 +28,6 @@ public class CreatePersonCommandHandler : IRequestHandler<CreatePersonRequest, U
     public async Task<Unit> Handle(CreatePersonRequest request, CancellationToken cancellationToken)
     {
         var existingPerson = await _repository.FirstOrDefaultAsync(x => x.PersonalId == request.PersonalId);
-
         if (existingPerson is not null)
         {
             throw new HttpException($"Person with PersonalId: {request.PersonalId} already exists.", HttpStatusCode.AlreadyReported);
@@ -44,22 +49,16 @@ public class CreatePersonRequest : ICommand<Unit>
 
     }
 
-    [Required]
     public string FirstName { get; set; }
 
-    [Required]
     public string LastName { get; set; }
 
-    [Required]
     public string PersonalId { get; set; }
 
-    [Required]
     public DateTime BirthDate { get; set; }
 
-    [Required]
     public int CityId { get; set; }
 
-    [Required]
     public Gender Gender { get; set; }
 
     public IEnumerable<PhoneNumberModel> PhoneNumbers { get; set; }
@@ -71,9 +70,13 @@ public class CreatePersonRequestValidation : AbstractValidator<CreatePersonReque
 
     public CreatePersonRequestValidation()
     {
+        var cultureName = CultureInfo.CurrentCulture.Name;
+
+        //var errorMessage = GetErrorMessage(cultureName, "FirstNameRequired");
+
         RuleFor(x => x.FirstName)
-           .NotNull().WithMessage("First name is required.")
-           .NotEmpty().WithMessage("First name is required.")
+           .NotNull().WithMessage(SharedResource.FirstNameRequired)
+           .NotEmpty().WithMessage(SharedResource.FirstNameRequired)
            .Length(2, 50).WithMessage("First name length should be between 2 and 50 characters.")
            .Matches(LatinOrGeorgianAlphabetsRegex)
            .WithMessage("First name should not contain both English and Georgian alphabets.");
@@ -112,5 +115,27 @@ public class CreatePersonRequestValidation : AbstractValidator<CreatePersonReque
                     .Must(x => Enum.TryParse<PhoneNumberType>(x.ToString(), out _))
                     .WithMessage("NumberType should be either Mobile, Office or Home.");
             });
+    }
+
+    private string GetErrorMessage(string cultureName, string key)
+    {
+        string resourceFileName;
+        switch (cultureName)
+        {
+            case "ka-GE":
+                resourceFileName = "Persons.Directory.Application/Resources/SharedResourceGE.resx";
+                break;
+            case "en-US":
+            default:
+                resourceFileName = "Persons.Directory.Application/Resources/SharedResourceEN.resx";
+                break;
+        }
+
+        var s1 = Assembly.GetExecutingAssembly().GetManifestResourceNames();
+
+
+        var s = Assembly.GetExecutingAssembly().FullName;
+        var resourceManager = new ResourceManager(resourceFileName, Assembly.GetExecutingAssembly());
+        return resourceManager.GetString(key);
     }
 }

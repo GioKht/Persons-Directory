@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Persons.Directory.Application;
-using Persons.Directory.Application.Infrastructure;
+using Persons.Directory.Application.Middlewares;
 using Persons.Directory.DI.StartupExtensions;
 using Persons.Directory.Persistence.Db;
 
@@ -16,11 +16,13 @@ public class DependencyResolver
         var connectionString = builder.Configuration.GetConnectionString(nameof(ApplicationDbContext));
 
         builder.Services
-            .AddMediatR(typeof(ApplicationProgram))
-            .AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>))
-            .AddFluentValidation()
+            .AddAppLocalization()
             .AddApplicationServices()
+            .AddAppControllers()
+            .AddMediatR(typeof(ApplicationProgram))
+            .AddFluentValidation()
             .AddApplicationDbContext(connectionString)
-            .AddHttpContextAccessor();
+            .AddHttpContextAccessor()
+            .AddEndpointsApiExplorer();
     }
 }
