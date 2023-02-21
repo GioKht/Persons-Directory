@@ -78,7 +78,7 @@ public class DbInitializer
             {
                 FirstName = "Nino",
                 LastName = "Goderdzishvili",
-                PersonalId = "01010101123",
+                PersonalId = "01010101456",
                 BirthDate = new DateTime(1980, 01, 01),
                 CityId = 2,
                 Gender = Gender.Female,
@@ -101,7 +101,7 @@ public class DbInitializer
             {
                 FirstName = "John",
                 LastName = "Doe",
-                PersonalId = "01010101123",
+                PersonalId = "01010101789",
                 BirthDate = new DateTime(1988, 05, 09),
                 CityId = 3,
                 Gender = Gender.Male,
