@@ -136,25 +136,3 @@ namespace Persons.Directory.Application.ReportManagement.Queries
         public int Count { get; set; }
     }
 }
-
-
-//var result = await persons
-//    .SortAndPage(request)
-//    .GroupBy(p => new { p.Id, p.FirstName, p.LastName })
-//    .Select(g => new GetRelatedPersonsResponseModel
-//    {
-//        Id = g.Key.Id,
-//        FirstName = g.Key.FirstName,
-//        LastName = g.Key.LastName,
-//        RelatedTypeCounts = g.SelectMany(x => x.RelatedPersons)
-//            .Where(rp => rp.RelatedType.HasValue)
-//            .AsEnumerable()
-//            .GroupBy(rp => rp.RelatedType.Value)
-//            .Select(gr => new RelatedTypeCount
-//            {
-//                Type = gr.Key,
-//                Count = gr.Count()
-//            })
-//            .ToList()
-//    })
-//    .ToListAsync();
