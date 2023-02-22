@@ -36,8 +36,6 @@ public class GetPersonsQueryHandler : IRequestHandler<GetPersonsRequest, GetPers
         var totalCount = baseQuery.Count();
 
         var persons = await baseQuery
-            .Include(p => p.RelatedPersons)
-            .ThenInclude(pr => pr.RelatedPerson)
             .SortAndPage(request)
             .Select(x => new PersonRecord(
                 x.Id,
