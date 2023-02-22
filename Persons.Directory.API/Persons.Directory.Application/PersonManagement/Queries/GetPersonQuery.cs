@@ -85,13 +85,9 @@ public class GetPersonDetailsResponse
 
     public string BirthDate { get; set; }
 
-    public int? RelatedPersonId { get; set; }
-
     public string Image { get; set; }
 
     public string Gender { get; set; }
-
-    public string RelatedType { get; set; }
 
     public IEnumerable<RelatedPersonRecord> RelatedPersons { get; set; }
 
