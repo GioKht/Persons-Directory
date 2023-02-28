@@ -17,8 +17,11 @@ public class CreatePersonCommandHandler : IRequestHandler<CreatePersonRequest, U
     private readonly IUnitOfWork _unitOfWork;
     private readonly IRepository<Person> _repository;
 
-    public CreatePersonCommandHandler(IUnitOfWork unitOfWork, IResourceManagerService resourceManagerService)
-        => (_unitOfWork, _repository) = (unitOfWork, unitOfWork.GetRepository<Person>());
+    public CreatePersonCommandHandler(IUnitOfWork unitOfWork)
+    {
+        _unitOfWork = unitOfWork;
+        _repository = unitOfWork.GetRepository<Person>();
+    }
 
     public async Task<Unit> Handle(CreatePersonRequest request, CancellationToken cancellationToken)
     {

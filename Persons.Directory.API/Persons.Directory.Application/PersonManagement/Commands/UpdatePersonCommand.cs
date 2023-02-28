@@ -20,8 +20,11 @@ public class UpdatePersonCommandHandler : IRequestHandler<UpdatePersonRequest, U
     private readonly IResourceManagerService _resourceManagerService;
 
     public UpdatePersonCommandHandler(IUnitOfWork unitOfWork, IResourceManagerService resourceManagerService)
-        => (_unitOfWork, _repository, _resourceManagerService)
-        = (unitOfWork, unitOfWork.GetRepository<Person>(), resourceManagerService);
+    {
+        _unitOfWork = unitOfWork;
+        _repository = unitOfWork.GetRepository<Person>();
+        _resourceManagerService = resourceManagerService;
+    }
 
     public async Task<Unit> Handle(UpdatePersonRequest request, CancellationToken cancellationToken)
     {

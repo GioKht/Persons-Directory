@@ -16,8 +16,11 @@ public class DeletePersonCommandHandler : IRequestHandler<DeletePersonRequest, U
     private readonly IResourceManagerService _resourceManagerService;
 
     public DeletePersonCommandHandler(IUnitOfWork unitOfWork, IResourceManagerService resourceManagerService)
-        => (_unitOfWork, _repository, _resourceManagerService)
-        = (unitOfWork, unitOfWork.GetRepository<Person>(), resourceManagerService);
+    {
+        _unitOfWork = unitOfWork;
+        _repository = unitOfWork.GetRepository<Person>();
+        _resourceManagerService = resourceManagerService;
+    }
 
     public async Task<Unit> Handle(DeletePersonRequest request, CancellationToken cancellationToken)
     {

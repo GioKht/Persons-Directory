@@ -4,7 +4,6 @@ using Persons.Directory.Application.Domain;
 using Persons.Directory.Application.Exceptions;
 using Persons.Directory.Application.Interfaces;
 using Persons.Directory.Application.Services;
-using System.Net;
 
 namespace Persons.Directory.Application.PersonManagement.Commands;
 
@@ -15,8 +14,11 @@ public class DeleteRelatedPersonCommandHandler : IRequestHandler<DeleteRelatedPe
     private readonly IResourceManagerService _resourceManagerService;
 
     public DeleteRelatedPersonCommandHandler(IUnitOfWork unitOfWork, IResourceManagerService resourceManagerService)
-        => (_unitOfWork, _repository, _resourceManagerService)
-        = (unitOfWork, unitOfWork.GetRepository<Person>(), resourceManagerService);
+    {
+        _unitOfWork = unitOfWork;
+        _repository = unitOfWork.GetRepository<Person>();
+        _resourceManagerService = resourceManagerService;
+    }
 
     public async Task<Unit> Handle(DeleteRelatedPersonRequest request, CancellationToken cancellationToken)
     {

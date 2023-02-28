@@ -18,7 +18,10 @@ public class GetPersonsQueryHandler : IRequestHandler<GetPersonsRequest, GetPers
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     public GetPersonsQueryHandler(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor)
-        => (_repository, _httpContextAccessor) = (unitOfWork.GetRepository<Person>(), httpContextAccessor);
+    {
+        _repository = unitOfWork.GetRepository<Person>();
+        _httpContextAccessor = httpContextAccessor;
+    }
 
     public async Task<GetPersonsResponse> Handle(GetPersonsRequest request, CancellationToken cancellationToken)
     {

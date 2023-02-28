@@ -5,7 +5,6 @@ using Persons.Directory.Application.Enums;
 using Persons.Directory.Application.Exceptions;
 using Persons.Directory.Application.Interfaces;
 using Persons.Directory.Application.Services;
-using System.Net;
 
 namespace Persons.Directory.Application.PersonManagement.Commands;
 
@@ -16,8 +15,11 @@ public class CreatePersonRelationshipCommandHandler : IRequestHandler<CreatePers
     private readonly IResourceManagerService _resourceManagerService;
 
     public CreatePersonRelationshipCommandHandler(IUnitOfWork unitOfWork, IResourceManagerService resourceManagerService)
-        => (_unitOfWork, _repository, _resourceManagerService)
-        = (unitOfWork, unitOfWork.GetRepository<Person>(), resourceManagerService);
+    {
+        _unitOfWork = unitOfWork;
+        _repository = unitOfWork.GetRepository<Person>();
+        _resourceManagerService = resourceManagerService;
+    }
 
     public async Task<Unit> Handle(CreatePersonRelationshipRequest request, CancellationToken cancellationToken)
     {

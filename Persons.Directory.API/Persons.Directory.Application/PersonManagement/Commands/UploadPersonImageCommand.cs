@@ -16,8 +16,10 @@ public class UploadPersonImageCommand : IRequestHandler<UploadPersonImageRequest
     private readonly IResourceManagerService _resourceManagerService;
 
     public UploadPersonImageCommand(IUnitOfWork unitOfWork, IResourceManagerService resourceManagerService)
-        => (_repository, _resourceManagerService)
-        = (unitOfWork.GetRepository<Person>(), resourceManagerService);
+    {
+        _repository = unitOfWork.GetRepository<Person>();
+        _resourceManagerService = resourceManagerService;
+    }
 
     public async Task<Unit> Handle(UploadPersonImageRequest request, CancellationToken cancellationToken)
     {

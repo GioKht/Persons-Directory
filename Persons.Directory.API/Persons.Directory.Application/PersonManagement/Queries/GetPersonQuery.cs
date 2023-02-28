@@ -18,8 +18,11 @@ public class GetPersonDetailsQueryHandler : IRequestHandler<GetPersonDetailsRequ
     private readonly IResourceManagerService _resourceManagerService;
 
     public GetPersonDetailsQueryHandler(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor, IResourceManagerService resourceManagerService)
-        => (_repository, _httpContextAccessor, _resourceManagerService)
-        = (unitOfWork.GetRepository<Person>(), httpContextAccessor, resourceManagerService);
+    {
+        _repository = unitOfWork.GetRepository<Person>();
+        _httpContextAccessor = httpContextAccessor;
+        _resourceManagerService = resourceManagerService;
+    }
 
     public async Task<GetPersonDetailsResponse> Handle(GetPersonDetailsRequest request, CancellationToken cancellationToken)
     {
